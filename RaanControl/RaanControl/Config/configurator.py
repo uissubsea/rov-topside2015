@@ -1,4 +1,6 @@
-## Config 2
+# Config Tool					
+# Uis Subsea					
+# Author : Tor Morten Finnesand
 
 import configparser
 
