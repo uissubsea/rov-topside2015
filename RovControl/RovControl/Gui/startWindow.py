@@ -71,14 +71,14 @@ class StartWindow(QtGui.QMainWindow):
 
         # reads global variable start_modus, and initiates next window
         if start_modus == "Normal":
-            self.close()
-            win = mainwidget.MainWidget()
-            win.__init__()
+            self.win = mainwidget.MainWidget()
+            self.hide()
+            self.win.show()
          
         elif start_modus == "Test":
             self.close()
-            win = testWindow.Test1()
-            win.__init__()
+            self.win = testWindow.Test1()
+            self.win.__init__()
 
         # If no match, show help option:
         else:
