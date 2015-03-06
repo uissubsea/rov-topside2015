@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Pod2</class>
+ <widget class="QWidget" name="Pod2">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>506</width>
+    <height>636</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>POD 2</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="mc1_groupBox">
+     <property name="title">
+      <string>MC1</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc1_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc1_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc1_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc1_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc1_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc1_power"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="mc3_groupBox">
+     <property name="title">
+      <string>MC3</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc3_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc3_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc3_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc3_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc3_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc3_power">
+        <property name="smallDecimalPoint">
+         <bool>false</bool>
+        </property>
+        <property name="numDigits">
+         <number>5</number>
+        </property>
+        <property name="mode">
+         <enum>QLCDNumber::Dec</enum>
+        </property>
+        <property name="segmentStyle">
+         <enum>QLCDNumber::Filled</enum>
+        </property>
+        <property name="intValue" stdset="0">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="mc4_groupBox">
+     <property name="title">
+      <string>MC4</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc4_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc4_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc4_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc4_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc4_power"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc4_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="mc5_groupBox">
+     <property name="title">
+      <string>MC5</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc5_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc5_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc5_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc5_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc5_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc5_power"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QGroupBox" name="mc6_groupBox">
+     <property name="title">
+      <string>MC6</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc6_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc6_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc6_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc6_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc6_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc6_power"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="mc7_groupBox">
+     <property name="title">
+      <string>MC7</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_8">
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc7_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc7_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc7_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc7_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc7_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc7_power"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QGroupBox" name="mc8_groupBox">
+     <property name="title">
+      <string>MC8</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_9">
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc8_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc8_voltage"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc8_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc8_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc8_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc8_power"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="mc2_groupBox">
+     <property name="title">
+      <string>MC2</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="QLabel" name="mc2_current_label">
+        <property name="text">
+         <string>Current [mA]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLCDNumber" name="mc2_voltage"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="mc2_current"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="mc2_power_label">
+        <property name="text">
+         <string>Power [W]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLCDNumber" name="mc2_power"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="mc2_voltage_label">
+        <property name="text">
+         <string>Voltage [V]</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="pod2_sensordata_groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Sensors</string>
+     </property>
+     <widget class="QLabel" name="temp_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Temp. [°C]</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="hydro_label">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>30</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hydrostat failure</string>
+      </property>
+     </widget>
+     <widget class="QLCDNumber" name="pod_temp">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>30</y>
+        <width>95</width>
+        <height>23</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>30</y>
+        <width>27</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="autoRaise">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
