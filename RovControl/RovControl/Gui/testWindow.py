@@ -29,18 +29,19 @@ class Test1(QtGui.QMainWindow):
 
     def initMenubar(self):
         menubar = self.menuBar()
+        
         fileMenu = menubar.addMenu('File')
         fileMenu.addAction('Preferences')
-        fileMenu.addAction('Save test results')
-        fileMenu.addAction('Save test results As...')
-        fileMenu.addAction('Open previous results')
-        fileMenu.addAction('Close Raan test mode') # OBS! Virker som end, exit++ 
-                                                  # er beskytta navn; funker IKKE!
-                                                  # Fjerner File fra menylinja...
-        settingsMenu = menubar.addMenu('Settings')
+        fileMenu.addAction('Return to menu')
+
         viewMenu = menubar.addMenu('View')
+        viewMenu.addAction('POD 1')
+        viewMenu.addAction('POD 2')
+
+        settingsMenu = menubar.addMenu('Settings')
+
         aboutMenu = menubar.addMenu('About')
-        aboutMenu.addAction('Raan V0.1a')
+        aboutMenu.addAction('Raan v0.1')
         
 
     def exitAction(self):

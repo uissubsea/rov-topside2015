@@ -46,6 +46,11 @@
     </property>
     <addaction name="actionCamera_1"/>
     <addaction name="actionCamera_2"/>
+    <addaction name="actionCamera_3"/>
+    <addaction name="separator"/>
+    <addaction name="actionPOD_1"/>
+    <addaction name="actionPOD_2"/>
+    <addaction name="separator"/>
     <addaction name="actionStatus"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
@@ -53,6 +58,7 @@
      <string>Settings</string>
     </property>
     <addaction name="actionOptions"/>
+    <addaction name="actionController"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -89,6 +95,26 @@
   <action name="actionStatus">
    <property name="text">
     <string>Status</string>
+   </property>
+  </action>
+  <action name="actionPOD_1">
+   <property name="text">
+    <string>POD 1</string>
+   </property>
+  </action>
+  <action name="actionPOD_2">
+   <property name="text">
+    <string>POD 2</string>
+   </property>
+  </action>
+  <action name="actionController">
+   <property name="text">
+    <string>Controller</string>
+   </property>
+  </action>
+  <action name="actionCamera_3">
+   <property name="text">
+    <string>Camera 3</string>
    </property>
   </action>
  </widget>
