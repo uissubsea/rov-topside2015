@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Thu Feb 26 10:02:39 2015
+# Created: Fri Mar  6 12:56:58 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(705, 553)
+        MainWindow.resize(1280, 800)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -60,11 +60,25 @@ class Ui_MainWindow(object):
         self.actionOptions.setObjectName(_fromUtf8("actionOptions"))
         self.actionStatus = QtGui.QAction(MainWindow)
         self.actionStatus.setObjectName(_fromUtf8("actionStatus"))
+        self.actionPOD_1 = QtGui.QAction(MainWindow)
+        self.actionPOD_1.setObjectName(_fromUtf8("actionPOD_1"))
+        self.actionPOD_2 = QtGui.QAction(MainWindow)
+        self.actionPOD_2.setObjectName(_fromUtf8("actionPOD_2"))
+        self.actionController = QtGui.QAction(MainWindow)
+        self.actionController.setObjectName(_fromUtf8("actionController"))
+        self.actionCamera_3 = QtGui.QAction(MainWindow)
+        self.actionCamera_3.setObjectName(_fromUtf8("actionCamera_3"))
         self.menuFile.addAction(self.actionExit_2)
         self.menuView.addAction(self.actionCamera_1)
         self.menuView.addAction(self.actionCamera_2)
+        self.menuView.addAction(self.actionCamera_3)
+        self.menuView.addSeparator()
+        self.menuView.addAction(self.actionPOD_1)
+        self.menuView.addAction(self.actionPOD_2)
+        self.menuView.addSeparator()
         self.menuView.addAction(self.actionStatus)
         self.menuSettings.addAction(self.actionOptions)
+        self.menuSettings.addAction(self.actionController)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
@@ -86,4 +100,8 @@ class Ui_MainWindow(object):
         self.actionCamera_2.setText(_translate("MainWindow", "Camera 2", None))
         self.actionOptions.setText(_translate("MainWindow", "Options", None))
         self.actionStatus.setText(_translate("MainWindow", "Status", None))
+        self.actionPOD_1.setText(_translate("MainWindow", "POD 1", None))
+        self.actionPOD_2.setText(_translate("MainWindow", "POD 2", None))
+        self.actionController.setText(_translate("MainWindow", "Controller", None))
+        self.actionCamera_3.setText(_translate("MainWindow", "Camera 3", None))
 
