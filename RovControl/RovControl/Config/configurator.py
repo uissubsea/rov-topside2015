@@ -6,10 +6,10 @@ import configparser
 
 class Configurator:
 
-	def __init__(self):
+	def __init__(self, config_file="rov_config.cfg"):
 		self.config = configparser.ConfigParser()
 		try:
-			self.cfgfile = open("rov_config.ini",'w+')
+			self.cfgfile = open(config_file,'w+')
 		except IOError:
 			print ("File Not found.. Creating\n")
 
@@ -35,7 +35,8 @@ class Configurator:
 			self.config.set(section, key, value)
 		except configparser.NoSectionError:
 			print("No section with name %s" %(section))
-			self.config.add_section(sectionToAdd)
+			self.config.add_section(section)
+			self.config.set(section, key, value)
 			print("Added")
 
 	def add_section_to_file(self, sectionToAdd):
@@ -52,15 +53,23 @@ class Configurator:
 		self.cfgfile = open("rov_config.ini",'w+')
 
 
-#configurator = Configurator()
+configurator = Configurator("joystick.cfg")
 
-#configurator.add_section_to_file('Joystick')
-#configurator.save_to_config('Joystick', 'deadzone', '10')
-#configurator.save_to_config('Joystick', 'xmax', '260')
-#configurator.save_to_config('Joystick', 'ymax', '260')
-#configurator.save_to_config('Joystick', 'deadzone', '50')
+configurator.add_section_to_file('Joystick')
+configurator.save_to_config('Joystick', 'deadzone', '10')
+configurator.save_to_config('Joystick', 'xmax', '260')
+configurator.save_to_config('Joystick', 'ymax', '260')
+configurator.save_to_config('Joystick', 'deadzone', '50')
 
-#configurator.save_to_config('Test', 'test', 'Hey')
+configurator.save_to_config('Joystick', 'thruster_x', '1')
+configurator.save_to_config('Joystick', 'thruster_y', '2')
+configurator.save_to_config('Joystick', 'thruster_z', '5')
 
-#configurator.write()
-#configurator.close()
+configurator.save_to_config('Aiuwgdiuagwd', 'thruster_x', '1')
+
+configurator.write()
+configurator.close()
+
+array = configurator.get_config("Joystick")
+print(array["thruster_x"])
+
