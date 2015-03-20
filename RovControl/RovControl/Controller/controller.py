@@ -8,7 +8,7 @@
 
 import sdl2
 
-class Joystick(object):
+class Controller(object):
 
 	def __init__(self):
 		
@@ -17,21 +17,21 @@ class Joystick(object):
 		if not (self.check_SDL_Error()):
 			print ("Joystick subsystem initialized")
 
-	def num_of_sticks(self):
+	def num_of_controllers(self):
 		return sdl2.SDL_NumJoysticks()
 
-	def list_joysticks(self):
+	def list_controllers(self):
 		
 		# Read Number of joysticks and 
 		# print the name and index to console
-		number_of_sticks = self.num_of_sticks()
-		if number_of_sticks > 0:
-			for i in range(number_of_sticks):
+		number_of_controllers = self.num_of_controllers()
+		if number_of_controllers > 0:
+			for i in range(number_of_controllers):
 				print ("Joystick %d : %s" %(i, sdl2.SDL_JoystickNameForIndex(i)))
 		else:
 			print ("No Joysticks connected")
 
-	def get_joysticks(self):
+	def get_controllers(self):
 		
 		# Returns the names of the attached joysticks in a list
 		list = []
@@ -43,7 +43,7 @@ class Joystick(object):
 	def num_of_axes(self, id):
 		return sld2.SDL_JoystickNumAxes(self.joy)
 
-	def open_joystick(self, id):
+	def open_controller(self, id):
 		
 		self.joy = sdl2.SDL_JoystickOpen(id)
 		self.check_SDL_Error()
@@ -66,7 +66,7 @@ class Joystick(object):
 	def get_button_state(self, button):
 		return sdl2.SDL_JoystickGetButton(self.joy, button)
 
-	def close_joystick(self):
+	def close_controller(self):
 		sdl2.SDL_JoystickClose(self.joy)
 		#sdl2.SDL_Quit()
 
