@@ -1,9 +1,14 @@
 #!/usr/bin/python
 
 import sys
+
+sys.path.insert(1, 'Joystick')
+#import joystick_old_version as js
+
 from PyQt4 import QtGui, QtCore
 from Gui import mainwindow, settingswindow, statuswindow, pod2, controller_config
-from Gui import testWindow
+from Gui import testWindow, manipulatorwidget, thrusterwidget
+
 
 ##############################################################################
 # Globale variable:
@@ -98,13 +103,19 @@ class MainWidget(QtGui.QMainWindow):
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # Make some local modifications.
+       # Make some local modifications.
 
-        # Connecting buttons
-        self.ui.actionOptions.triggered.connect(self.open_settingsWindow)
+        # Connecting buttons:
+        #   --> on-top widgets:
+        self.ui.actionOptions.triggered.connect(self.open_options)
+        self.ui.actionController.triggered.connect(self.open_controllerConfig)
+        #   --> integrated widgets:
         self.ui.actionStatus.triggered.connect(self.open_statusWindow)
         self.ui.actionPOD_2.triggered.connect(self.open_pod2)
-        self.ui.actionController.triggered.connect(self.open_controllerConfig)
+        self.ui.actionThursters.triggered.connect(self.open_thrusterWidget)
+        self.ui.actionManipulator.triggered.connect(self.open_manipulatorWidget)
+        
+        self.ui.actionExit.triggered.connect(self.exit)
 
         self.show()
 
@@ -112,41 +123,56 @@ class MainWidget(QtGui.QMainWindow):
         self.subwindow2 = QtGui.QMdiSubWindow()
         self.subwindow3 = QtGui.QMdiSubWindow()
         self.subwindow4 = QtGui.QMdiSubWindow()
+        self.subwindow5 = QtGui.QMdiSubWindow()
+        self.subwindow6 = QtGui.QMdiSubWindow()
 
-        # Create 
-        self.cfgWindow = QtGui.QWidget()
-        self.ui1 = settingswindow.Ui_SettingsWindow()
-        self.ui1.setupUi(self.cfgWindow)
-        self.subwindow1.setWidget(self.cfgWindow)
-        self.ui.mdiArea.addSubWindow(self.subwindow1)
+        
 
+    def open_options(self):
+        self.optWindow = QtGui.QWidget()
+        self.ui1 = optionwindow.Ui_OptionsWindow()
+        self.ui1.setupUi(self.optWindow)
+        self.subwindow1.setWidget(self.optWindow)
+        self.optWindow.show()
+
+    def open_statusWindow(self):
         self.statWindow = QtGui.QWidget()
         self.ui2 = statuswindow.Ui_StatusWindow()
         self.ui2.setupUi(self.statWindow)
         self.subwindow2.setWidget(self.statWindow)
         self.ui.mdiArea.addSubWindow(self.subwindow2)
+        self.statWindow.show()
 
+    def open_pod2(self):
         self.pod2Window = pod2.SubWindow()
         self.subwindow3.setWidget(self.pod2Window)
         self.ui.mdiArea.addSubWindow(self.subwindow3)
+        self.pod2Window.show()
 
+    def open_controllerConfig(self):
         self.cntrConfigWindow = QtGui.QWidget()
         self.ui4 = controller_config.Ui_controller_config()
         self.ui4.setupUi(self.cntrConfigWindow)
         self.subwindow4.setWidget(self.cntrConfigWindow)
         #self.ui.mdiArea.addSubWindow(self.subwindow4)
-
-    def open_settingsWindow(self):
-        self.cfgWindow.show()
-
-    def open_statusWindow(self):
-        self.statWindow.show()
-
-    def open_pod2(self):
-        self.pod2Window.show()
-
-    def open_controllerConfig(self):
         self.cntrConfigWindow.show()
+
+    def open_thrusterWidget(self):
+        self.thrWindow = thrusterwidget.ThrusterWidget()
+        self.subwindow5.setWidget(self.thrWindow)
+        # Add subwindow to mdiArea:
+        self.ui.mdiArea.addSubWindow(self.subwindow5)
+        self.thrWindow.show()
+
+    def open_manipulatorWidget(self):
+        self.maniWindow = manipulatorwidget.ManipulatorWidget()
+        self.subwindow6.setWidget(self.maniWindow)
+        self.ui.mdiArea.addSubWindow(self.subwindow6)
+        self.maniWindow.show()
+
+    def exit(self):
+        self.close()
+
 
 def main():
     app = QtGui.QApplication(sys.argv)

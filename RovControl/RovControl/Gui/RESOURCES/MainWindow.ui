@@ -33,7 +33,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionExit_2"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -52,6 +52,8 @@
     <addaction name="actionPOD_2"/>
     <addaction name="separator"/>
     <addaction name="actionStatus"/>
+    <addaction name="actionManipulator"/>
+    <addaction name="actionThursters"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -66,7 +68,7 @@
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionExit_2">
+  <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
@@ -115,6 +117,16 @@
   <action name="actionCamera_3">
    <property name="text">
     <string>Camera 3</string>
+   </property>
+  </action>
+  <action name="actionManipulator">
+   <property name="text">
+    <string>Manipulator</string>
+   </property>
+  </action>
+  <action name="actionThursters">
+   <property name="text">
+    <string>Thursters</string>
    </property>
   </action>
  </widget>
