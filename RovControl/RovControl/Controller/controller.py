@@ -7,71 +7,114 @@
 # UiS Subsea 2015
 
 import sdl2
+import sys
+
 
 class Controller(object):
 
+	# Initiates joystick:
 	def __init__(self):
-		
-		# List connected joysticks ?
+
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
-		if not (self.check_SDL_Error()):
-			print ("Joystick subsystem initialized")
+		print ("initialized controller subsystem")
 
-	def num_of_controllers(self):
-		return sdl2.SDL_NumJoysticks()
-
-	def list_controllers(self):
+		controller_connected = False
+		num = self.number_of_controllers_connected()
 		
-		# Read Number of joysticks and 
-		# print the name and index to console
-		number_of_controllers = self.num_of_controllers()
-		if number_of_controllers > 0:
-			for i in range(number_of_controllers):
-				print ("Joystick %d : %s" %(i, sdl2.SDL_JoystickNameForIndex(i)))
+		if (not controller_connected and num > 0):
+			for i in range (num):
+				self.open_controller(i)
+				#print(sdl2.SDL_JoystickNameForIndex(i))
+				controller_connected = True
 		else:
-			print ("No Joysticks connected")
+			print("Make sure the controller is plugged in correctly!", 
+				file = sys.stderr)
 
-	def get_controllers(self):
-		
-		# Returns the names of the attached joysticks in a list
-		list = []
-		for i in range(self.num_of_sticks()):
-			list.append(sdl2.SDL_JoystickNameForIndex(i))
-
-		return list
-
-	def num_of_axes(self, id):
-		return sld2.SDL_JoystickNumAxes(self.joy)
 
 	def open_controller(self, id):
-		
-		self.joy = sdl2.SDL_JoystickOpen(id)
-		self.check_SDL_Error()
+		self.controller = sdl2.SDL_JoystickOpen(id) #input: device index (Obs for flere kontrollere)
 
-	def check_SDL_Error(self):
+
+	def close_controller(self, id):
+		sdl2.SDL_JoystickClose(id)
+	
+
+	def number_of_controllers_connected(self):
+		return sdl2.SDL_NumJoysticks()
+
+
+	def get_controller_name(self):
+		num = self.number_of_controllers_connected()
+		name_list = []
 		
-		err = sdl2.SDL_GetError()
-		if (err):
-			print (err)
-			return True
+		if num > 0:
+			for i in range(num):
+				name_list.append(sdl2.SDL_JoystickNameForIndex(i))	
 		else:
-			return False
+			print("No controllers connected")
+			#list = NULL
+
+		return name_list
+
+
+	def get_controller_id(self):
+		num = self.number_of_controllers_connected()
+		id_list = []
+		
+		if num > 0:
+			for i in range(num):
+				#id_list.append(sdl2.SDL_JoystickInstanceID(self.controller))
+				# --> returnerer kun idnr til siste tilkoblede kontroller!	
+				id_list.append(i)
+		else:
+			print("No controllers connected")
+			id_list = NULL
+
+		return id_list
+
+
+	def recognize_controllers(self):
+		cntrs = self.get_controller_name()
+
+		for i in range (len(cntrs)):
+			if cntrs[i] == b'Controller':
+				cntrs[i] = "xbox_" + str(i)
+			if cntrs[i] == b'Logitech Extreme 3D':
+				cntrs[i] = "logitech_joystick_" + str(i)
+			if len(cntrs) == 0:
+				cntrs = NULL
+		
+		# Returnerer liste med nye controller navn. Siste tall tilsvarer id-nr.
+		return cntrs
+
 
 	def read_axis(self, axis, smoothing):
-		
 		sdl2.SDL_JoystickUpdate()
+		return sdl2.SDL_JoystickGetAxis(self.controller, axis) / smoothing
 
-		return sdl2.SDL_JoystickGetAxis(self.joy, axis) / smoothing
+
+	# Returns axes to controller with ID id:
+	def get_axes(self, id):
+		return sld2.SDL_JoystickNumAxes(self.controller)
+
 
 	def get_button_state(self, button):
-		return sdl2.SDL_JoystickGetButton(self.joy, button)
+		return sdl2.SDL_JoystickGetButton(self.controller, button)
 
-	def close_controller(self):
-		sdl2.SDL_JoystickClose(self.joy)
-		#sdl2.SDL_Quit()
 
-	## Todo ##
-	# Add method:
-	# Calibrate_Joystick
-	# Method to read button values
-	# Method to list buttons
+	def get_buttons(self, id):
+		list = []
+		return list
+
+##############################################################################
+# For testing:
+def main():
+	test = Controller()
+	print(test.get_controller_name())
+	print(test.get_controller_id())
+	print(test.recognize_controllers())
+
+	
+if __name__ == '__main__':
+	main()
+

@@ -1,7 +1,14 @@
+'''
+GUI-applikasjon som henter pådragsverdier fra thrusterene og fremstiller det 
+intuitivt for bruker. Implementert i hovedprogrammet som en subwidget i mdiArea.
+
+Elisabeth - UiS Subsea 2015
+'''
+
 import sys
 from PyQt4 import QtGui, QtCore
-sys.path.insert(1, '../Joystick')
-import Joystick as js
+#sys.path.insert(1, '../Joystick')
+import joystick_old_version as js
 
 ##############################################################################
 # Global variables:
@@ -16,7 +23,7 @@ th7 = 0
 th8 = 0
 
 ##############################################################################
-#
+# TODO
 # Hent styrekontrollverdier og tilegn verdien til glob.vars (se over), som 
 # igjen styrer prosessbarene i widgeten. 
 # På sikt, hent verdier direkte fra thrusterene.
@@ -39,8 +46,8 @@ class ThrusterWidget(QtGui.QWidget):
 		super(ThrusterWidget, self).__init__()
 
 		# Init. controller:
-		self.controller = js.Joystick()
-		self.controller.open_joystick(0)
+		self.controller = js.Controller()
+		self.controller.open_controller(0)
 		
 		self.initUI()
 
@@ -48,12 +55,12 @@ class ThrusterWidget(QtGui.QWidget):
 	def initUI(self):
 		# Draw widget window:
 		self.setGeometry(0, 0, 350, 400)
-		self.center()
+		self.setMaximumSize (350, 400)
+		self.setMinimumSize(350, 400)
+		#self.center()
 		self.setWindowTitle('Thruster status')
 		self.addPropellers()
-		self.show()
-
-		
+		#self.show()
 
 
 	# paintEvent kalles automatisk med QWidget.update() !!! Jippiyay :D
@@ -78,7 +85,7 @@ class ThrusterWidget(QtGui.QWidget):
 			self.prop = QtGui.QLabel(self)
 			self.prop.setScaledContents(True)
 			self.prop.setGeometry(xpos[i], ypos[i], 30, 30)
-			propimg = QtGui.QPixmap('RESOURCES/propeller.png')
+			propimg = QtGui.QPixmap('Gui/RESOURCES/propeller.png')
 			self.prop.setPixmap(propimg)
 
 
@@ -86,14 +93,15 @@ class ThrusterWidget(QtGui.QWidget):
 		global th1, th2, th3, th4, th5, th6, th7, th8
 		
 		# Read controller values:
-		th1 = self.controller.get_button_state(6)
-		th2 = self.controller.get_button_state(7)
-		th3 = self.controller.get_button_state(10)
-		th4 = self.controller.get_button_state(11)
-		th5 = self.controller.get_button_state(12)
-		th6 = self.controller.get_button_state(13)
-		th7 = self.controller.get_button_state(14)
-		th8 = self.controller.get_button_state(15)
+		th1 = self.controller.get_button_state(3)*30
+		th2 = self.controller.get_button_state(1)*30
+		th3 = self.controller.get_button_state(0)*30
+		th4 = self.controller.get_button_state(2)*30
+		th5 = self.controller.read_axis(0,1000)
+		th6 = self.controller.read_axis(1,1000)
+		th7 = self.controller.read_axis(3,1000)
+		th8 = self.controller.read_axis(4,1000)
+		# OBS! Thrusterverdier skal hentes direkte fra motorpådrag!
 
 		th_array = [th1, th2, th3, th4, th5, th6, th7, th8]
 		print(th_array)
@@ -140,16 +148,14 @@ class ThrusterWidget(QtGui.QWidget):
 		# Init. glob.vars:
 		global th5, th6, th7, th8
 
-		# Init. QPainter:
-		qp = QtGui.QPainter()
-		qp.begin(self)
-
 		# Define colors:
 		GREEN = QtGui.QColor(150,226,0)
 
-		# Fill process bars:
+		# Init. QPainter:
+		qp = QtGui.QPainter()
+		qp.begin(self)
 		qp.setBrush(GREEN)
-		
+
 		# Thruster no. 5
 		qp.drawRect(125, 125, 20, th5) # siste: +/- 30
 		# Thruster no. 6
@@ -202,11 +208,11 @@ class ThrusterWidget(QtGui.QWidget):
 
 ##############################################################################
 # For testing:
-def main():
-	app = QtGui.QApplication(sys.argv)
-	ex = ThrusterWidget()
-	sys.exit(app.exec_())
+#def main():
+#	app = QtGui.QApplication(sys.argv)
+#	ex = ThrusterWidget()
+#	sys.exit(app.exec_())
 
 
-if __name__ == '__main__':
-	main()
+#if __name__ == '__main__':
+#	main()

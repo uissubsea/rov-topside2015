@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MainWindow.ui'
+# Form implementation generated from reading ui file 'RESOURCES/mainwindow.ui'
 #
-# Created: Fri Mar  6 12:56:58 2015
+# Created: Thu Mar 26 14:59:32 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(1280, 800)
+        MainWindow.resize(705, 553)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -50,8 +50,8 @@ class Ui_MainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
-        self.actionExit_2 = QtGui.QAction(MainWindow)
-        self.actionExit_2.setObjectName(_fromUtf8("actionExit_2"))
+        self.actionExit = QtGui.QAction(MainWindow)
+        self.actionExit.setObjectName(_fromUtf8("actionExit"))
         self.actionCamera_1 = QtGui.QAction(MainWindow)
         self.actionCamera_1.setObjectName(_fromUtf8("actionCamera_1"))
         self.actionCamera_2 = QtGui.QAction(MainWindow)
@@ -68,7 +68,11 @@ class Ui_MainWindow(object):
         self.actionController.setObjectName(_fromUtf8("actionController"))
         self.actionCamera_3 = QtGui.QAction(MainWindow)
         self.actionCamera_3.setObjectName(_fromUtf8("actionCamera_3"))
-        self.menuFile.addAction(self.actionExit_2)
+        self.actionManipulator = QtGui.QAction(MainWindow)
+        self.actionManipulator.setObjectName(_fromUtf8("actionManipulator"))
+        self.actionThursters = QtGui.QAction(MainWindow)
+        self.actionThursters.setObjectName(_fromUtf8("actionThursters"))
+        self.menuFile.addAction(self.actionExit)
         self.menuView.addAction(self.actionCamera_1)
         self.menuView.addAction(self.actionCamera_2)
         self.menuView.addAction(self.actionCamera_3)
@@ -77,6 +81,8 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionPOD_2)
         self.menuView.addSeparator()
         self.menuView.addAction(self.actionStatus)
+        self.menuView.addAction(self.actionManipulator)
+        self.menuView.addAction(self.actionThursters)
         self.menuSettings.addAction(self.actionOptions)
         self.menuSettings.addAction(self.actionController)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -93,9 +99,9 @@ class Ui_MainWindow(object):
         self.menuAbout.setTitle(_translate("MainWindow", "About", None))
         self.menuView.setTitle(_translate("MainWindow", "View", None))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings", None))
-        self.actionExit_2.setText(_translate("MainWindow", "Exit", None))
-        self.actionExit_2.setToolTip(_translate("MainWindow", "Exit the application", None))
-        self.actionExit_2.setShortcut(_translate("MainWindow", "Ctrl+Q", None))
+        self.actionExit.setText(_translate("MainWindow", "Exit", None))
+        self.actionExit.setToolTip(_translate("MainWindow", "Exit the application", None))
+        self.actionExit.setShortcut(_translate("MainWindow", "Ctrl+Q", None))
         self.actionCamera_1.setText(_translate("MainWindow", "Camera 1", None))
         self.actionCamera_2.setText(_translate("MainWindow", "Camera 2", None))
         self.actionOptions.setText(_translate("MainWindow", "Options", None))
@@ -104,4 +110,6 @@ class Ui_MainWindow(object):
         self.actionPOD_2.setText(_translate("MainWindow", "POD 2", None))
         self.actionController.setText(_translate("MainWindow", "Controller", None))
         self.actionCamera_3.setText(_translate("MainWindow", "Camera 3", None))
+        self.actionManipulator.setText(_translate("MainWindow", "Manipulator", None))
+        self.actionThursters.setText(_translate("MainWindow", "Thursters", None))
 
