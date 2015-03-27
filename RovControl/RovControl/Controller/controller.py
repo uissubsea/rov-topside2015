@@ -7,114 +7,127 @@
 # UiS Subsea 2015
 
 import sdl2
-import sys
+import sdl2.ext
+import threading
+import time
 
+CONTROLLER_SMOOTH = 100
+DEAD_ZONE = 100
 
 class Controller(object):
 
-	# Initiates joystick:
+
+
 	def __init__(self):
 
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
-		print ("initialized controller subsystem")
+		if not (self.check_SDL_Error()):
+			print ("Joystick subsystem initialized")
 
-		controller_connected = False
-		num = self.number_of_controllers_connected()
+		sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
+
+		# Create thread
+
+		# Try to open joystick
+
+		self.open_controller()
 		
-		if (not controller_connected and num > 0):
-			for i in range (num):
-				self.open_controller(i)
-				#print(sdl2.SDL_JoystickNameForIndex(i))
-				controller_connected = True
+		self.ctrl_adata = [""]
+		self.ctrl_bdata = [""]
+
+		self.thread = threading.Thread(target = self.controller_loop)
+		self.thread.start()
+
+	def controller_loop(self):
+
+		# Get events
+		self.running = True
+		while(self.running):
+			self.events = sdl2.ext.get_events()
+			for event in self.events:
+				self.handle_events(event)
+
+			time.sleep(0.05)
+
+	def handle_events(self, event):
+		# If Controller Event
+
+		if event.type == sdl2.SDL_JOYDEVICEADDED:
+			# Open connected joystick
+			self.open_controller()
+
+		elif event.type == sdl2.SDL_JOYAXISMOTION:
+			for i in range(self.num_axes): 
+				
+				if event.jaxis.axis == i:
+					# Left- right movement (x)
+				
+					value = int(event.jaxis.value/CONTROLLER_SMOOTH)
+					if (value < -DEAD_ZONE):
+						value = value + DEAD_ZONE
+						self.ctrl_adata[i] = str(value)
+					elif (value > DEAD_ZONE):
+						value = value - DEAD_ZONE
+						self.ctrl_adata[i] = str(value)
+
+
+		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
+			for i in range(self.num_btns):
+				if event.jbutton.button == i:
+					self.ctrl_bdata[i] = str(event.jbutton.state)
+				print("Key pressed")
+				#self.running = False
+
+		# Other Events
+
+	def open_controller(self):
+		self.num_ctrl = sdl2.SDL_NumJoysticks()
+		if self.num_ctrl != 0:
+			self.ctrl = sdl2.SDL_JoystickOpen(self.num_ctrl - 1)
+			print("Opened controller %s" %(sdl2.SDL_JoystickName(self.ctrl)))
+
+			self.num_axes = sdl2.SDL_JoystickNumAxes(self.ctrl)
+			self.num_btns = sdl2.SDL_JoystickNumButtons(self.ctrl)
+			self.ctrl_adata = [""] * self.num_axes
+			self.ctrl_bdata = [""] * self.num_btns
 		else:
-			print("Make sure the controller is plugged in correctly!", 
-				file = sys.stderr)
+			print("No Controller detected!, Connect now")
 
+	def get_buttonData(self):
+		return self.ctrl_bdata
 
-	def open_controller(self, id):
-		self.controller = sdl2.SDL_JoystickOpen(id) #input: device index (Obs for flere kontrollere)
+	def get_axisData(self):
+		return self.ctrl_adata
 
-
-	def close_controller(self, id):
-		sdl2.SDL_JoystickClose(id)
-	
-
-	def number_of_controllers_connected(self):
-		return sdl2.SDL_NumJoysticks()
-
-
-	def get_controller_name(self):
-		num = self.number_of_controllers_connected()
-		name_list = []
-		
-		if num > 0:
-			for i in range(num):
-				name_list.append(sdl2.SDL_JoystickNameForIndex(i))	
-		else:
-			print("No controllers connected")
-			#list = NULL
-
-		return name_list
-
-
-	def get_controller_id(self):
-		num = self.number_of_controllers_connected()
-		id_list = []
-		
-		if num > 0:
-			for i in range(num):
-				#id_list.append(sdl2.SDL_JoystickInstanceID(self.controller))
-				# --> returnerer kun idnr til siste tilkoblede kontroller!	
-				id_list.append(i)
-		else:
-			print("No controllers connected")
-			id_list = NULL
-
-		return id_list
-
-
-	def recognize_controllers(self):
-		cntrs = self.get_controller_name()
-
-		for i in range (len(cntrs)):
-			if cntrs[i] == b'Controller':
-				cntrs[i] = "xbox_" + str(i)
-			if cntrs[i] == b'Logitech Extreme 3D':
-				cntrs[i] = "logitech_joystick_" + str(i)
-			if len(cntrs) == 0:
-				cntrs = NULL
-		
-		# Returnerer liste med nye controller navn. Siste tall tilsvarer id-nr.
-		return cntrs
-
-
-	def read_axis(self, axis, smoothing):
-		sdl2.SDL_JoystickUpdate()
-		return sdl2.SDL_JoystickGetAxis(self.controller, axis) / smoothing
-
-
-	# Returns axes to controller with ID id:
-	def get_axes(self, id):
-		return sld2.SDL_JoystickNumAxes(self.controller)
-
-
-	def get_button_state(self, button):
-		return sdl2.SDL_JoystickGetButton(self.controller, button)
-
-
-	def get_buttons(self, id):
-		list = []
-		return list
-
-##############################################################################
-# For testing:
 def main():
-	test = Controller()
-	print(test.get_controller_name())
-	print(test.get_controller_id())
-	print(test.recognize_controllers())
 
-	
+	ctrl = Controller()
+
 if __name__ == '__main__':
-	main()
+    main()
 
+"""
+elif event.type == sdl2.SDL_JOYAXISMOTION:
+			for i in range(self.num_axes): 
+				if event.jaxis.axis == 0:
+					# Left- right movement (x)
+				
+					xValue = int(event.jaxis.value/CONTROLLER_SMOOTH)
+					if (xValue < -DEAD_ZONE):
+						xValue = xValue + DEAD_ZONE
+						self.ctrl_data[0] = str(xValue)
+					elif (xValue > DEAD_ZONE):
+						xValue = xValue - DEAD_ZONE
+						self.ctrl_data[0] = str(xValue)
+			
+			elif event.jaxis.axis == 1:
+				# Up Down movement (y)
+				yValue = int(event.jaxis.value/CONTROLLER_SMOOTH)
+
+				if (yValue < -DEAD_ZONE):
+					yValue = yValue + DEAD_ZONE
+					self.ctrl_data[1] = str(yValue)
+				elif (yValue > DEAD_ZONE):
+					yValue = yValue - DEAD_ZONE
+					self.ctrl_data[1] = str(yValue)
+					"""
