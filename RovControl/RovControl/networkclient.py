@@ -16,7 +16,6 @@ class NetworkClient():
 	def __init__(self, address="192.168.1.20", port=50000):
 		self.rov_data = ["0","0","0","0","0"]
 
-
 		self.ctrl = controller.Controller()
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,7 +24,7 @@ class NetworkClient():
 		#Create thread to run
 		self.thread = threading.Thread(target = self.start_client)
 		self.thread.start()
-				
+
 
 	def start_client(self):
 
@@ -38,6 +37,7 @@ class NetworkClient():
 			except socket.error as msg:
 				# Log error
 				time.sleep(2)
+				print("Unable to connect");
 
 		# Thread Loop
 
@@ -45,21 +45,25 @@ class NetworkClient():
 		self.running = True
 
 		while self.running:	
-			self.events = sdl2.ext.get_events()
-			for event in self.events:
-				self.handle_events(event)
 			
-			self.str = self.create_string(self.rov_data)
+			# Get newest Joystick data
 
-			print(self.str, "\r", end="")
+			self.axis_data = self.ctrl.ctrl_adata
+			self.button_data = self.ctrl.ctrl_bdata
 
-			self.sock.sendall(bytes(self.str, 'UTF-8'))
+			self.str = self.create_string(self.axis_data)
+
+			#print(self.str, "\r", end="")
+
+			#self.sock.sendall(bytes(self.str, 'UTF-8'))
+			self.sock.sendall(bytes(b"heywww - 2test"))
+			#print("data sendt");
 
 				## Receive back from ROV and log
-			self.data = self.sock.recv(64)
+			self.data = self.sock.recv(128)
 			time.sleep(0.05)
 			
-			#print(self.data)
+			print(self.data)
 
 		self.sock.close()
 
@@ -69,43 +73,10 @@ class NetworkClient():
 		sdl2.SDL_JoystickOpen(0)
 		print("Opened Joystick")
 
-	def handle_events(self, event):
-		# If Controller Event
-
-		if event.type == sdl2.SDL_JOYAXISMOTION:
-			if event.jaxis.axis == 0:
-				# Left- right movement (x)
-				
-				xValue = int(event.jaxis.value/CONTROLLER_SMOOTH)
-				if (xValue < -DEAD_ZONE):
-					xValue = xValue + DEAD_ZONE
-					self.rov_data[0] = str(xValue)
-				elif (xValue > DEAD_ZONE):
-					xValue = xValue - DEAD_ZONE
-					self.rov_data[0] = str(xValue)
-			
-			elif event.jaxis.axis == 1:
-				# Up Down movement (y)
-				yValue = int(event.jaxis.value/CONTROLLER_SMOOTH)
-
-				if (yValue < -DEAD_ZONE):
-					yValue = yValue + DEAD_ZONE
-					self.rov_data[1] = str(yValue)
-				elif (yValue > DEAD_ZONE):
-					yValue = yValue - DEAD_ZONE
-					self.rov_data[1] = str(yValue)
-
-
-		if event.type == sdl2.SDL_JOYBUTTONDOWN:
-			print("Key pressed")
-			self.running = False
-
-		# Other Events
-
 	def create_string(self, rov_data):
 		string = ""
-		string += "T"
-		for i in range(2):
+		#string += "T"
+		for i in range(3):
 			string += rov_data[i] + ","
 		
 		string += ";"

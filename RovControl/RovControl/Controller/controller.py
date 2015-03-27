@@ -30,8 +30,8 @@ class Controller(object):
 
 		self.open_controller()
 		
-		self.ctrl_adata = [0]
-		self.ctrl_bdata = [0]
+		self.ctrl_adata = [""]
+		self.ctrl_bdata = [""]
 
 		self.thread = threading.Thread(target = self.controller_loop)
 		self.thread.start()
@@ -86,8 +86,8 @@ class Controller(object):
 
 			self.num_axes = sdl2.SDL_JoystickNumAxes(self.ctrl)
 			self.num_btns = sdl2.SDL_JoystickNumButtons(self.ctrl)
-			self.ctrl_adata = [0] * self.num_axes
-			self.ctrl_bdata = [0] * self.num_btns
+			self.ctrl_adata = [""] * self.num_axes
+			self.ctrl_bdata = [""] * self.num_btns
 		else:
 			print("No Controller detected!, Connect now")
 
