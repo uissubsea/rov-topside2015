@@ -94,6 +94,7 @@ class StartWindow(QtGui.QMainWindow):
         global start_modus
         start_modus = text
 
+
 class MainWidget(QtGui.QMainWindow):
     
     def __init__(self):
