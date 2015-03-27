@@ -6,7 +6,7 @@ sys.path.insert(1, 'Joystick')
 #import joystick_old_version as js
 
 from PyQt4 import QtGui, QtCore
-from Gui import mainwindow, settingswindow, statuswindow, pod2, controller_config
+from Gui import mainwindow, settingswindow, statuswindow, pod2, cntrconfig2
 from Gui import testWindow, manipulatorwidget, thrusterwidget
 
 
@@ -94,6 +94,7 @@ class StartWindow(QtGui.QMainWindow):
         global start_modus
         start_modus = text
 
+
 class MainWidget(QtGui.QMainWindow):
     
     def __init__(self):
@@ -150,12 +151,10 @@ class MainWidget(QtGui.QMainWindow):
         self.pod2Window.show()
 
     def open_controllerConfig(self):
-        self.cntrConfigWindow = QtGui.QWidget()
-        self.ui4 = controller_config.Ui_controller_config()
-        self.ui4.setupUi(self.cntrConfigWindow)
-        self.subwindow4.setWidget(self.cntrConfigWindow)
-        #self.ui.mdiArea.addSubWindow(self.subwindow4)
-        self.cntrConfigWindow.show()
+        self.cnfigWindow = cntrconfig2.ConfigWindow()
+        self.subwindow4.setWidget(self.cnfigWindow)
+        self.ui.mdiArea.addSubWindow(self.subwindow4)
+        self.cnfigWindow.show()
 
     def open_thrusterWidget(self):
         self.thrWindow = thrusterwidget.ThrusterWidget()
