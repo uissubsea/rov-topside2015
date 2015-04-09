@@ -8,7 +8,7 @@ Elisabeth - UiS Subsea 2015
 import sys
 from PyQt4 import QtGui, QtCore
 #sys.path.insert(1, '../Joystick')
-import joystick_old_version as js
+#import joystick_old_version as js
 
 ##############################################################################
 # Global variables:
@@ -46,8 +46,8 @@ class ThrusterWidget(QtGui.QWidget):
 		super(ThrusterWidget, self).__init__()
 
 		# Init. controller:
-		self.controller = js.Controller()
-		self.controller.open_controller(0)
+		#self.controller = js.Controller()
+		#self.controller.open_controller(0)
 		
 		self.initUI()
 
@@ -93,14 +93,14 @@ class ThrusterWidget(QtGui.QWidget):
 		global th1, th2, th3, th4, th5, th6, th7, th8
 		
 		# Read controller values:
-		th1 = self.controller.get_button_state(3)*30
-		th2 = self.controller.get_button_state(1)*30
-		th3 = self.controller.get_button_state(0)*30
-		th4 = self.controller.get_button_state(2)*30
-		th5 = self.controller.read_axis(0,1000)
-		th6 = self.controller.read_axis(1,1000)
-		th7 = self.controller.read_axis(3,1000)
-		th8 = self.controller.read_axis(4,1000)
+		#th1 = self.controller.get_button_state(3)*30
+		#th2 = self.controller.get_button_state(1)*30
+		#th3 = self.controller.get_button_state(0)*30
+		#th4 = self.controller.get_button_state(2)*30
+		#th5 = self.controller.read_axis(0,1000)
+		#th6 = self.controller.read_axis(1,1000)
+		#th7 = self.controller.read_axis(3,1000)
+		#th8 = self.controller.read_axis(4,1000)
 		# OBS! Thrusterverdier skal hentes direkte fra motorpådrag!
 
 		th_array = [th1, th2, th3, th4, th5, th6, th7, th8]

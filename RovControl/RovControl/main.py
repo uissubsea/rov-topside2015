@@ -2,13 +2,13 @@
 
 import sys
 
-sys.path.insert(1, 'Joystick')
+sys.path.insert(1, "../RovControl")
 #import joystick_old_version as js
 
 from PyQt4 import QtGui, QtCore
 from Gui import mainwindow, settingswindow, statuswindow, pod2, cntrconfig2
 from Gui import testWindow, manipulatorwidget, thrusterwidget
-
+from RovNetwork import networkclient
 
 ##############################################################################
 # Globale variable:
@@ -127,7 +127,22 @@ class MainWidget(QtGui.QMainWindow):
         self.subwindow5 = QtGui.QMdiSubWindow()
         self.subwindow6 = QtGui.QMdiSubWindow()
 
+        # Start Network Client
+        self.netClient = networkclient.NetworkClient()
         
+
+    def open_logFile(self):
+         # Create Q Text Stream for status window
+        print("awdawawdaw")
+        self.logFile = QtCore.QFile('status.log')
+        try:
+            self.logFile.open(QtCore.QIODevice.ReadOnly)
+            self.stream = QtCore.QTextStream(self.logFile)
+            self.ui2.textEdit.setText(self.stream.readAll())
+        except e:
+            print(e)
+
+
 
     def open_options(self):
         self.optWindow = QtGui.QWidget()
@@ -143,6 +158,7 @@ class MainWidget(QtGui.QMainWindow):
         self.subwindow2.setWidget(self.statWindow)
         self.ui.mdiArea.addSubWindow(self.subwindow2)
         self.statWindow.show()
+        self.open_logFile()
 
     def open_pod2(self):
         self.pod2Window = pod2.SubWindow()
@@ -170,12 +186,17 @@ class MainWidget(QtGui.QMainWindow):
         self.maniWindow.show()
 
     def exit(self):
+        # Stop Network client
+        self.netClient.stop()
         self.close()
+        print("Stopped?")
+        sys.exit()
 
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    window = StartWindow()
+    #window = StartWindow()
+    window = MainWidget()
     window.show()
     sys.exit(app.exec_())
 

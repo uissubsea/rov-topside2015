@@ -9,7 +9,7 @@ Elisabeth - UiS Subsea 2015
 import sys
 from PyQt4 import QtGui, QtCore
 #sys.path.insert(1, '../Joystick')
-import joystick_old_version as js
+#import joystick_old_version as js
 
 ##############################################################################
 # Global variables:
@@ -44,8 +44,8 @@ class ManipulatorWidget(QtGui.QWidget):
 		super(ManipulatorWidget, self).__init__()
 
 		# Init. controller:
-		self.controller = js.Controller()
-		self.controller.open_controller(0)
+		#self.controller = js.Controller()
+		#self.controller.open_controller(0)
 
 		self.initUI()
 
@@ -99,11 +99,11 @@ class ManipulatorWidget(QtGui.QWidget):
 		global m1, m2, m3, m4, m5
 
 		# Read controller values:
-		m1 = int(self.controller.read_axis(0,1000))
-		m2 = int(self.controller.read_axis(3,1000))
-		m3 = int(self.controller.read_axis(4,1000))
-		m4 = int(self.controller.read_axis(1,1000))
-		m5 = int(self.controller.read_axis(2,1000))
+		#m1 = int(self.controller.read_axis(0,1000))
+		#m2 = int(self.controller.read_axis(3,1000))
+		#m3 = int(self.controller.read_axis(4,1000))
+		#m4 = int(self.controller.read_axis(1,1000))
+		#m5 = int(self.controller.read_axis(2,1000))
 
 		#print(m1)
 

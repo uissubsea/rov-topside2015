@@ -13,7 +13,7 @@ class Configurator:
 		except IOError:
 			print ("File Not found.. Creating\n")
 
-		print("Config Opened!")
+		print("Opened %s" %(config_file))
 
 	def get_config(self, section):
 		self.dict = {}
@@ -39,6 +39,9 @@ class Configurator:
 			self.config.set(section, key, value)
 			print("Added")
 
+	def check_for_section(self, section):
+		return self.config.has_section(section)
+
 	def add_section_to_file(self, sectionToAdd):
 		self.config.add_section(sectionToAdd)
 
@@ -51,25 +54,3 @@ class Configurator:
 
 	def open(self):
 		self.cfgfile = open("rov_config.ini",'w+')
-
-
-configurator = Configurator("joystick.cfg")
-
-configurator.add_section_to_file('Joystick')
-configurator.save_to_config('Joystick', 'deadzone', '10')
-configurator.save_to_config('Joystick', 'xmax', '260')
-configurator.save_to_config('Joystick', 'ymax', '260')
-configurator.save_to_config('Joystick', 'deadzone', '50')
-
-configurator.save_to_config('Joystick', 'thruster_x', '1')
-configurator.save_to_config('Joystick', 'thruster_y', '2')
-configurator.save_to_config('Joystick', 'thruster_z', '5')
-
-configurator.save_to_config('Aiuwgdiuagwd', 'thruster_x', '1')
-
-configurator.write()
-configurator.close()
-
-array = configurator.get_config("Joystick")
-print(array["thruster_x"])
-
