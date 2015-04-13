@@ -1,7 +1,7 @@
-import cv2
+#import cv2
 
-from PyQt4 import QtGui
-
+from PyQt4 import QtGui, QtCore
+'''
 class OpenCVQImage(QtGui.QImage):
 
 	def __init__(self, opencvBgrImg):
@@ -98,7 +98,41 @@ class CameraWidget(QtGui.QWidget):
 			return
 		painter = QtGui.QPainter(self)
 		painter.drawImage(QtCore.QPoint(0, 0), OpenCVQImage(self._frame))
+'''
 
+class TestWindowCam1(QtGui.QWidget):
+	def __init__(self):
+		super(TestWindowCam1,self).__init__()
+		self.initUI()
+
+	def initUI(self):
+		self.setGeometry(100,100,200,200) #or fullscreen
+		self.setWindowTitle('Cam 1')
+		self.mainGrid = QtGui.QGridLayout(self)
+
+
+class TestWindowCam2(QtGui.QWidget):
+	def __init__(self):
+		super(TestWindowCam2,self).__init__()
+		self.initUI()
+
+	def initUI(self):
+		self.setGeometry(100,100,200,200) #or fullscreen
+		self.setWindowTitle('Cam 2')
+		self.mainGrid = QtGui.QGridLayout(self)
+
+
+class TestWindowCam3(QtGui.QWidget):
+	def __init__(self):
+		super(TestWindowCam3,self).__init__()
+		self.initUI()
+
+	def initUI(self):
+		self.setGeometry(100,100,200,200) #or fullscreen
+		self.setWindowTitle('Cam 3')
+		self.mainGrid = QtGui.QGridLayout(self)
+		
+'''
 def _main():
 
 	@QtCore.pyqtSlot(cv2.iplimage)
@@ -125,3 +159,5 @@ def _main():
 
 if __name__ == '__main__':
     main()
+'''
+

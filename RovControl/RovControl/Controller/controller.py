@@ -20,7 +20,7 @@ class Controller(object):
 	def __init__(self):
 
 		self.config = configparser.ConfigParser()
-		self.config.read('controller.cfg')
+		self.config.read('Config/controller.cfg')
 
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
 
@@ -36,11 +36,14 @@ class Controller(object):
 
 		self.open_controller()
 		
-		self.ctrl_adata = [0]
-		self.ctrl_bdata = [0]
+		# Stores value from axis no. i in ctrl_axisdata[i]
+		self.ctrl_axisdata = [0]
+		# Stores value from button no. i in ctrl_buttondata[i]
+		self.ctrl_buttondata = [0]
 
 		self.thread = threading.Thread(target = self.controller_loop)
 		self.thread.start()
+
 
 	def controller_loop(self):
 
@@ -52,9 +55,10 @@ class Controller(object):
 			for event in self.events:
 				self.handle_events(event)
 			#self.changed = False
-			#print(self.ctrl_adata)
+			#print(self.ctrl_axisdata)
 
 			time.sleep(0.05)
+
 
 	def handle_events(self, event):
 		# If Controller Event
@@ -71,31 +75,32 @@ class Controller(object):
 					value = int(event.jaxis.value/self.CONTROLLER_SMOOTH)
 					if (value > -self.DEAD_ZONE and value < self.DEAD_ZONE):
 						#Inside Dead zone
-						self.ctrl_adata[i] = 0
+						self.ctrl_axisdata[i] = 0
 
 					elif (value < -self.DEAD_ZONE):
 						value = value + self.DEAD_ZONE
 						if (value < -1000):
-							self.ctrl_adata[i] = -1000
+							self.ctrl_axisdata[i] = -1000
 						else:
-							self.ctrl_adata[i] = value
+							self.ctrl_axisdata[i] = value
 					
 					elif (value > self.DEAD_ZONE):
 						value = value - self.DEAD_ZONE
 						if (value > 1000):
-							self.ctrl_adata[i] = 1000
+							self.ctrl_axisdata[i] = 1000
 						else:
-							self.ctrl_adata[i] = value
+							self.ctrl_axisdata[i] = value
 
 
 		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
 			self.changed = True
 			for i in range(self.num_btns):
 				if event.jbutton.button == i:
-					self.ctrl_bdata[i] = event.jbutton.state
+					self.ctrl_buttondata[i] = event.jbutton.state
 				#print("Key pressed")
 				#self.running = False
 		# Other Events
+
 
 	def open_controller(self):
 		self.num_ctrl = sdl2.SDL_NumJoysticks()
@@ -106,8 +111,8 @@ class Controller(object):
 
 			self.num_axes = sdl2.SDL_JoystickNumAxes(self.ctrl)
 			self.num_btns = sdl2.SDL_JoystickNumButtons(self.ctrl)
-			self.ctrl_adata = [0] * self.num_axes
-			self.ctrl_bdata = [0] * self.num_btns
+			self.ctrl_axisdata = [0] * self.num_axes
+			self.ctrl_buttondata = [0] * self.num_btns
 
 			# Determine if controller needs calibration.
 			# Else Load data
@@ -124,11 +129,14 @@ class Controller(object):
 		else:
 			print("No Controller detected!, Connect now")
 
+
 	def get_buttonData(self):
-		return self.ctrl_bdata
+		return self.ctrl_buttondata
+
 
 	def get_axisData(self):
-		return self.ctrl_adata
+		return self.ctrl_axisdata
+
 
 	def calibrate(self):
 		# If We have entered this function, the config has no
@@ -158,19 +166,19 @@ class Controller(object):
 					self.ctrl_amin[i] = value
 				
 
-		# Max values should now be in ctrl_adata list.
+		# Max values should now be in ctrl_axisdata list.
 		# Write values to config.
 		for i in range(self.num_axes):
-			#self.config.save_to_config(str(self.ctrl_name), "Axis" + str(i), str(self.ctrl_adata[i]))
+			#self.config.save_to_config(str(self.ctrl_name), "Axis" + str(i), str(self.ctrl_axisdata[i]))
 			self.config[str(self.ctrl_name)]['Axis' + str(i) + "Max"] = str(self.ctrl_amax[i])
 			self.config[str(self.ctrl_name)]['Axis' + str(i) + "Min"] = str(self.ctrl_amin[i])
 
 
 		# Add default deadzone and filter
 		self.config[str(self.ctrl_name)]['DEAD_ZONE'] = '100'
-		self.config[str(self.ctrl_name)]['SMOOTH'] = "100"
+		self.config[str(self.ctrl_name)]['SMOOTH'] = '100'
 
-		with open('controller.cfg', 'w') as configfile:
+		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
 
 		print("Done calibrating")

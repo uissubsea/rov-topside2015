@@ -1,4 +1,5 @@
 import sys
+import time
 from PyQt4 import QtCore, QtGui
 from pyqtgraph import PlotWidget
 
@@ -10,6 +11,9 @@ class ConfigWindow(QtGui.QWidget):
 
 
 	def initUI(self):
+		self.EXP_S_DEFAULT = 20
+		self.LIN_S_DEFAULT = 10
+
 		self.resize(680, 600)
 		self.setMinimumSize(680, 600)
 		self.setMaximumSize(680, 600)
@@ -26,7 +30,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.addMainButtons()
 
 		self.show()
-
+		
 
 	def addMainButtons(self):
 		self.cancelButton = QtGui.QPushButton("Cancel", self)
@@ -41,16 +45,6 @@ class ConfigWindow(QtGui.QWidget):
 		self.resetButton.setGeometry(14, 550, 91, 32)
 		self.resetButton.clicked.connect(self.resetButtonHandler)
 
-
-	def cancelButtonHandler(self):
-		print("Cancel pressed")
-		self.close()
-
-	def applyButtonHandler(self):
-		print("Apply pressed")
-
-	def resetButtonHandler(self):
-		print("Reset pressed")
 
 
 	def addKeyTab(self):
@@ -69,17 +63,26 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersGB.setGeometry(20, 380, 591, 111)
 		self.addOthersGBContents()
 
+
 	def addControllerTab(self):
 		self.controllerTab = QtGui.QWidget()
 		self.tabwindow.addTab(self.controllerTab, "Controller")
+
 
 	def addSensTab(self):
 		self.sensitivityTab = QtGui.QWidget()
 		self.tabwindow.addTab(self.sensitivityTab, "Sensitivity")
 
+		self.thSensGB = QtGui.QGroupBox("Throttle", self.sensitivityTab)
+		self.thSensGB.setGeometry(20, 10, 591, 201)
+		self.addThSensGBContents()
+
+		self.maSensGB = QtGui.QGroupBox("Manipulator", self.sensitivityTab)
+		self.maSensGB.setGeometry(20, 230, 591, 231)
+		self.addMaSensGBContents()
+
 
 	def addThrusterGBContents(self):
-		
 		# Add labels:
 		text = ['Up', 'Down', 'Forward', 'Reverse', 
 					'Right', 'Left', 'Rotate CW', 'Rotate CCW']
@@ -116,21 +119,20 @@ class ConfigWindow(QtGui.QWidget):
 		#oppdater bilde, og fiks adresse når widget kobles opp mot main!
 		self.thImg.setPixmap(rov)
 
+
 	def addManipulatorGBContents(self):
-		
 		# Add labels:
 		text = ['Claw: open', 'Claw: grip', 'Claw: rotate cw', 'Claw: rotate ccw',
 					'Claw: tilt up', 'Claw: tilt down', 
-					'Arm: raise', 'Arm: lower', 'Arm: rotate cw', 'Arm: rotate ccw',
-					'Arm: bend', 'Arm: stretch']
-		xpos = [20, 20, 20, 20, 20, 20, 220, 220, 220, 220, 220, 220]
-		ypos = [30, 60, 90, 120, 150, 180, 30, 60, 90, 120, 150, 180]
+					'Arm: raise', 'Arm: lower', 'Arm: bend', 'Arm: stretch']
+		xpos = [20, 20, 20, 20, 20, 20, 220, 220, 220, 220]
+		ypos = [30, 60, 90, 120, 150, 180, 30, 60, 90, 120]
 
 		for i in range(len(text)):
 			self.label = QtGui.QLabel(text[i], self.manipulatorGB)
 			self.label.setGeometry(xpos[i], ypos[i], 110, 20)
 
-		# Add key labels:
+		# Add key inputs:
 		self.mcRotateCCW = QtGui.QLineEdit(self.manipulatorGB)
 		self.mcRotateCCW.setGeometry(130, 120, 41, 20)
 		self.mcRotateCW_key = QtGui.QLineEdit(self.manipulatorGB)
@@ -147,15 +149,10 @@ class ConfigWindow(QtGui.QWidget):
 		self.maRaise_key.setGeometry(330, 30, 41, 20)
 		self.maLower_key = QtGui.QLineEdit(self.manipulatorGB)
 		self.maLower_key.setGeometry(330, 60, 41, 20)
-		self.maRotateCW_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maRotateCW_key.setGeometry(330, 90, 41, 20)
-		self.maRotateCCW = QtGui.QLineEdit(self.manipulatorGB)
-		self.maRotateCCW.setGeometry(330, 120, 41, 20)
 		self.maBend_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maBend_key.setGeometry(330, 150, 41, 20)
+		self.maBend_key.setGeometry(330, 90, 41, 20)
 		self.maStretch_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maStretch_key.setGeometry(330, 180, 41, 20)
-        
+		self.maStretch_key.setGeometry(330, 120, 41, 20)
 
 		# Add illustration:
 		self.maImg = QtGui.QLabel(self.manipulatorGB)
@@ -164,13 +161,115 @@ class ConfigWindow(QtGui.QWidget):
 		arm = QtGui.QPixmap('RESOURCES/manipulator.jpg')
 		self.maImg.setPixmap(arm)
 
+
 	def addOthersGBContents(self):
-		print("elfn")
+		# Add labels:
+		text = ['Lights: on/off', 'Cam. 1: on/off', 'Cam. 2: on/off',
+				'Cam. 3: on/off', '?DP knapp?']
+		xpos = [20, 20, 220, 220, 420]
+		ypos = [40, 70, 40, 70, 40]
+
+		for i in range(len(text)):
+			self.label = QtGui.QLabel(text[i], self.othersGB)
+			self.label.setGeometry(xpos[i], ypos[i], 110, 20)
+		
+		# Add key inputs:
+		self.lightToggle_key = QtGui.QLineEdit(self.othersGB)
+		self.lightToggle_key.setGeometry(130, 40, 41, 20)
+		self.cam1Toggle_key = QtGui.QLineEdit(self.othersGB)
+		self.cam1Toggle_key.setGeometry(130, 70, 41, 20)
+		self.cam2Toggle_key = QtGui.QLineEdit(self.othersGB)
+		self.cam2Toggle_key.setGeometry(330, 40, 41, 20)
+		self.cam3Toggle_key = QtGui.QLineEdit(self.othersGB)
+		self.cam3Toggle_key.setGeometry(330, 70, 41, 20)
+		self.holdToggle_key = QtGui.QLineEdit(self.othersGB)
+		self.holdToggle_key.setGeometry(510, 40, 41, 20)
 	
 
+	def addThSensGBContents(self):
+		self.linButton = QtGui.QRadioButton(self.thSensGB)
+		self.linButton.setGeometry(20, 50, 20, 20)
+		self.linButton.setChecked(True) #Default
+		
+		self.linLabel = QtGui.QLabel("Linear", self.thSensGB)
+		self.linLabel.setGeometry(50, 50, 50, 20)
+		self.linSliderValue = QtGui.QLabel(str(self.LIN_S_DEFAULT), self.thSensGB)
+		self.linSliderValue.setGeometry(340, 50, 50, 20)
+
+		self.linSlider = QtGui.QSlider(self.thSensGB)
+		self.linSlider.setGeometry(150, 50, 160, 22)
+		self.linSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.linSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.linSlider.setTickInterval(0)
+		self.linSlider.setValue(self.LIN_S_DEFAULT)
+
+
+		self.expButton = QtGui.QRadioButton(self.thSensGB)
+		self.expButton.setGeometry(20, 80, 102, 20)
+		
+		self.expLabel =QtGui.QLabel("Exponential", self.thSensGB)
+		self.expLabel.setGeometry(50, 80, 90, 20)
+		self.expSliderValue = QtGui.QLabel(str(self.EXP_S_DEFAULT), self.thSensGB)
+		self.expSliderValue.setGeometry(340, 80, 50, 20)
+
+		self.expSlider = QtGui.QSlider(self.thSensGB)
+		self.expSlider.setGeometry(150, 80, 160, 22)
+		self.expSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.expSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.expSlider.setTickInterval(0)
+		self.expSlider.setEnabled(False) #Defalut
+		self.expSlider.setValue(self.EXP_S_DEFAULT)
+		
+		# Action handlers:
+		self.linButton.clicked.connect(self.linButtonHandler)
+		self.expButton.clicked.connect(self.expButtonHandler)
+		self.linSlider.actionTriggered.connect(self.updateSliders)
+		self.expSlider.actionTriggered.connect(self.updateSliders)
+		#print(self.linSlider.value())
 		
 
-# For testing:
+	def addMaSensGBContents(self):
+		print("ejlrf")
+		
+################################################################################
+#   BUTTON HANDLERS --- class ConfigWindow()
+################################################################################
+
+	def linButtonHandler(self):
+		self.linSlider.setEnabled(True)
+		self.expSlider.setEnabled(False)
+		self.updateSliders()
+
+
+	def expButtonHandler(self):
+		self.linSlider.setEnabled(False)
+		self.expSlider.setEnabled(True)
+		self.updateSliders()
+	
+
+	def cancelButtonHandler(self):
+		print("Cancel pressed")
+		self.close()
+
+
+	def applyButtonHandler(self):
+		print("Apply pressed")
+
+
+	def resetButtonHandler(self):
+		self.linSlider.setValue(self.LIN_S_DEFAULT)
+		self.expSlider.setValue(self.EXP_S_DEFAULT)
+		self.updateSliders()
+
+		print("Reset pressed")
+
+	def updateSliders(self):
+		self.linSliderValue.setText(str(self.linSlider.value()))
+		self.expSliderValue.setText(str(self.expSlider.value()))
+################################################################################
+#   MAIN
+################################################################################
+
 def main():
 	app = QtGui.QApplication(sys.argv)
 	ex = ConfigWindow()
@@ -179,3 +278,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+

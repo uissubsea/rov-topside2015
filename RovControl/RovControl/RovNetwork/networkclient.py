@@ -1,6 +1,9 @@
 #import sys
 #sys.path.insert(1, '../Controller')
+'''
+Skriv kort hva fila gjør :)
 
+'''
 import sys
 import sdl2
 import sdl2.ext
@@ -8,7 +11,6 @@ import socket
 import threading
 import time
 from Controller import controller
-
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +25,8 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
+
+
 
 class NetworkClient():
 	def __init__(self, address="192.168.1.20", port=50000):
@@ -61,12 +65,13 @@ class NetworkClient():
 		while not self._stop.isSet():	
 			
 			# Get newest Joystick data
-
-			self.axis_data = self.ctrl.ctrl_adata
-			self.button_data = self.ctrl.ctrl_bdata
+			# EDIT: read data from processcontrollerdata.py instead!
+			self.axis_data = self.ctrl.ctrl_axisdata
+			self.button_data = self.ctrl.ctrl_buttondata
 
 			print(self.axis_data)
-			# Only send data if controller status changed
+
+			# Only send data when controller status changed
 			if (self.ctrl.changed):
 
 				self.str = self.serialize(self.axis_data)
@@ -94,11 +99,10 @@ class NetworkClient():
 		# Create ASCII string to contain data
 		string = ""
 		# Loop through first 4 data. Assume they are thruster values
-		for i in range(4):
+		for i in range(2):
 			string += str(rov_data[i]) + ","
 		
 		#string += ";"
-
 		return string
 
 	def stop(self):
