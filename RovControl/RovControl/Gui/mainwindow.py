@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'RESOURCES/mainwindow.ui'
+# Form implementation generated from reading ui file 'RESOURCES/MainWindow.ui'
 #
-# Created: Thu Mar 26 14:59:32 2015
+# Created: Mon Apr 13 14:18:32 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -56,8 +56,8 @@ class Ui_MainWindow(object):
         self.actionCamera_1.setObjectName(_fromUtf8("actionCamera_1"))
         self.actionCamera_2 = QtGui.QAction(MainWindow)
         self.actionCamera_2.setObjectName(_fromUtf8("actionCamera_2"))
-        self.actionOptions = QtGui.QAction(MainWindow)
-        self.actionOptions.setObjectName(_fromUtf8("actionOptions"))
+        #self.actionOptions = QtGui.QAction(MainWindow)
+        #self.actionOptions.setObjectName(_fromUtf8("actionOptions"))
         self.actionStatus = QtGui.QAction(MainWindow)
         self.actionStatus.setObjectName(_fromUtf8("actionStatus"))
         self.actionPOD_1 = QtGui.QAction(MainWindow)
@@ -72,7 +72,17 @@ class Ui_MainWindow(object):
         self.actionManipulator.setObjectName(_fromUtf8("actionManipulator"))
         self.actionThursters = QtGui.QAction(MainWindow)
         self.actionThursters.setObjectName(_fromUtf8("actionThursters"))
+        self.actionDepth_sensor = QtGui.QAction(MainWindow)
+        self.actionDepth_sensor.setObjectName(_fromUtf8("actionDepth_sensor"))
+        self.actionUiS_Subsea = QtGui.QAction(MainWindow)
+        self.actionUiS_Subsea.setObjectName(_fromUtf8("actionUiS_Subsea"))
+        self.actionAboutROV = QtGui.QAction(MainWindow)
+        self.actionAboutROV.setObjectName(_fromUtf8("actionAboutROV"))
+        self.actionOption = QtGui.QAction(MainWindow)
+        self.actionOption.setObjectName(_fromUtf8("actionOption"))
         self.menuFile.addAction(self.actionExit)
+        self.menuAbout.addAction(self.actionUiS_Subsea)
+        self.menuAbout.addAction(self.actionAboutROV)
         self.menuView.addAction(self.actionCamera_1)
         self.menuView.addAction(self.actionCamera_2)
         self.menuView.addAction(self.actionCamera_3)
@@ -80,11 +90,14 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionPOD_1)
         self.menuView.addAction(self.actionPOD_2)
         self.menuView.addSeparator()
-        self.menuView.addAction(self.actionStatus)
         self.menuView.addAction(self.actionManipulator)
         self.menuView.addAction(self.actionThursters)
-        self.menuSettings.addAction(self.actionOptions)
+        self.menuView.addAction(self.actionDepth_sensor)
+        self.menuView.addSeparator()
+        self.menuView.addAction(self.actionStatus)
         self.menuSettings.addAction(self.actionController)
+        self.menuSettings.addSeparator()
+        self.menuSettings.addAction(self.actionOption)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
@@ -104,7 +117,7 @@ class Ui_MainWindow(object):
         self.actionExit.setShortcut(_translate("MainWindow", "Ctrl+Q", None))
         self.actionCamera_1.setText(_translate("MainWindow", "Camera 1", None))
         self.actionCamera_2.setText(_translate("MainWindow", "Camera 2", None))
-        self.actionOptions.setText(_translate("MainWindow", "Options", None))
+        #self.actionOptions.setText(_translate("MainWindow", "Options", None))
         self.actionStatus.setText(_translate("MainWindow", "Status", None))
         self.actionPOD_1.setText(_translate("MainWindow", "POD 1", None))
         self.actionPOD_2.setText(_translate("MainWindow", "POD 2", None))
@@ -112,4 +125,8 @@ class Ui_MainWindow(object):
         self.actionCamera_3.setText(_translate("MainWindow", "Camera 3", None))
         self.actionManipulator.setText(_translate("MainWindow", "Manipulator", None))
         self.actionThursters.setText(_translate("MainWindow", "Thursters", None))
+        self.actionDepth_sensor.setText(_translate("MainWindow", "Depth sensor", None))
+        self.actionUiS_Subsea.setText(_translate("MainWindow", "UiS Subsea", None))
+        self.actionAboutROV.setText(_translate("MainWindow", "Njord v.2.8.1 beta", None))
+        self.actionOption.setText(_translate("MainWindow", "Options", None))
 

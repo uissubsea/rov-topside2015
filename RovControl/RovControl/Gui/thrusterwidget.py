@@ -10,17 +10,6 @@ from PyQt4 import QtGui, QtCore
 #sys.path.insert(1, '../Joystick')
 #import joystick_old_version as js
 
-##############################################################################
-# Global variables:
-# (Range: [-100, 100]% <--> [-30, 30])
-th1 = 0
-th2 = 0
-th3 = 0
-th4 = 0
-th5 = 0
-th6 = 0
-th7 = 0
-th8 = 0
 
 ##############################################################################
 # TODO
@@ -49,6 +38,17 @@ class ThrusterWidget(QtGui.QWidget):
 		#self.controller = js.Controller()
 		#self.controller.open_controller(0)
 		
+		# Init. th-values:
+		self.th1 = 0
+		self.th2 = 0
+		self.th3 = 0
+		self.th4 = 0
+		self.th5 = 0
+		self.th6 = 0
+		self.th7 = 0
+		self.th8 = 0
+
+		# Init. user interface:
 		self.initUI()
 
 
@@ -90,21 +90,20 @@ class ThrusterWidget(QtGui.QWidget):
 
 
 	def updateData(self):
-		global th1, th2, th3, th4, th5, th6, th7, th8
 		
 		# Read controller values:
-		#th1 = self.controller.get_button_state(3)*30
-		#th2 = self.controller.get_button_state(1)*30
-		#th3 = self.controller.get_button_state(0)*30
-		#th4 = self.controller.get_button_state(2)*30
-		#th5 = self.controller.read_axis(0,1000)
-		#th6 = self.controller.read_axis(1,1000)
-		#th7 = self.controller.read_axis(3,1000)
-		#th8 = self.controller.read_axis(4,1000)
+		#self.th1 = self.controller.get_button_state(3)*30
+		#self.th2 = self.controller.get_button_state(1)*30
+		#self.th3 = self.controller.get_button_state(0)*30
+		#self.th4 = self.controller.get_button_state(2)*30
+		#self.th5 = self.controller.read_axis(0,1000)
+		#self.th6 = self.controller.read_axis(1,1000)
+		#self.th7 = self.controller.read_axis(3,1000)
+		#self.th8 = self.controller.read_axis(4,1000)
 		# OBS! Thrusterverdier skal hentes direkte fra motorpådrag!
 
-		th_array = [th1, th2, th3, th4, th5, th6, th7, th8]
-		print(th_array)
+		#th_array = [th1, th2, th3, th4, th5, th6, th7, th8]
+		#print(th_array)
 
 		# Re-draw process bars:
 		self.updateProcessBars()
@@ -157,21 +156,19 @@ class ThrusterWidget(QtGui.QWidget):
 		qp.setBrush(GREEN)
 
 		# Thruster no. 5
-		qp.drawRect(125, 125, 20, th5) # siste: +/- 30
+		qp.drawRect(125, 125, 20, self.th5) # siste: +/- 30
 		# Thruster no. 6
-		qp.drawRect(198, 125, 20, th6) # siste: +/- 30
+		qp.drawRect(198, 125, 20, self.th6) # siste: +/- 30
 		# Thruster no. 7
-		qp.drawRect(125, 270, 20, th7) # siste: +/- 30
+		qp.drawRect(125, 270, 20, self.th7) # siste: +/- 30
 		# Thruster no. 8
-		qp.drawRect(198, 270, 20, th8) # siste: +/- 30
+		qp.drawRect(198, 270, 20, self.th8) # siste: +/- 30
 
 		# Close QPainter:
 		qp.end()
 
 
 	def updateTiltedProcessBars(self):
-		# Init. glob.vars:
-		global th1, th2, th3, th4
 
 		# Init. QPainter:
 		qp = QtGui.QPainter()
@@ -185,13 +182,13 @@ class ThrusterWidget(QtGui.QWidget):
 		qp.setBrush(GREEN)
 
 		# Thruster no. 1
-		qp.drawRect(100, 0, 20, th1) # siste: +/- 30
+		qp.drawRect(100, 0, 20, self.th1) # siste: +/- 30
 		# Thruster no. 2
-		qp.drawRect(248, -145, th2, 20) # nest siste: +/- 30
+		qp.drawRect(248, -145, self.th2, 20) # nest siste: +/- 30
 		# Thruster no. 3
-		qp.drawRect(285, 162, th3, 20) # nest siste: +/- 30
+		qp.drawRect(285, 162, self.th3, 20) # nest siste: +/- 30
 		# Thruster no. 4
-		qp.drawRect(410, 35, 20, th4) # siste: +/- 30
+		qp.drawRect(410, 35, 20, self.th4) # siste: +/- 30
 
 		# Close QPainter:
 		#qp.rotate(-45)

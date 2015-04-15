@@ -8,17 +8,20 @@ Elisabeth - UiS Subsea 2015
 
 import sys
 from PyQt4 import QtGui, QtCore
+from Controller import controller
 #sys.path.insert(1, '../Joystick')
 #import joystick_old_version as js
 
 ##############################################################################
 # Global variables:
-# (Range: [-100, 100]% <--> [-30, 30])?
+'''# (Range: [-100, 100]% <--> [-30, 30])?
+
 m1 = 0
 m2 = 0
 m3 = 0
 m4 = 0
 m5 = 0
+'''
 
 ##############################################################################
 #
@@ -44,9 +47,18 @@ class ManipulatorWidget(QtGui.QWidget):
 		super(ManipulatorWidget, self).__init__()
 
 		# Init. controller:
-		#self.controller = js.Controller()
-		#self.controller.open_controller(0)
+		self.ctrl = controller.Controller()
+		self.axis_data = self.ctrl.ctrl_axisdata
+		self.button_data = self.ctrl.ctrl_buttondata
 
+		# Init. m values:
+		self.m1 = 0 
+		self.m2 = 0
+		self.m3 = 0
+		self.m4 = 0
+		self.m5 = 0
+
+		# Init. UI:
 		self.initUI()
 
 
@@ -96,16 +108,21 @@ class ManipulatorWidget(QtGui.QWidget):
 
 
 	def updateData(self):
-		global m1, m2, m3, m4, m5
-
+		#global m1, m2, m3, m4, m5
+		'''
+		self.m1 = self.axis_data[0]
+		self.m2 = self.axis_data[1]
+		self.m3 = self.axis_data[2]
+		self.m4 = self.axis_data[3]
+		self.m5 = self.axis_data[4]
+		'''
+		#print(self.m1)
 		# Read controller values:
 		#m1 = int(self.controller.read_axis(0,1000))
 		#m2 = int(self.controller.read_axis(3,1000))
 		#m3 = int(self.controller.read_axis(4,1000))
 		#m4 = int(self.controller.read_axis(1,1000))
 		#m5 = int(self.controller.read_axis(2,1000))
-
-		#print(m1)
 
 		# Re-draw process bars:
 		self.updateProcessBars()
@@ -150,7 +167,7 @@ class ManipulatorWidget(QtGui.QWidget):
 
 	def updateProcessBars(self):
 		# Init. glob.vars:
-		global m1, m2, m3, m4, m5
+		#global m1, m2, m3, m4, m5
 
 		# Define colors:
 		GREEN = QtGui.QColor(150,226,0)
@@ -161,15 +178,15 @@ class ManipulatorWidget(QtGui.QWidget):
 		qp.setBrush(GREEN)
 
 		# Tilt arm:
-		qp.drawRect(20, 210, 20, m1) #m1: +-30
+		qp.drawRect(20, 210, 20, self.m1) #m1: +-30
 		# Bend arm:
-		qp.drawRect(140, 45, m2, 20)
+		qp.drawRect(140, 45, self.m2, 20)
 		# Rotate claw:
-		qp.drawRect(242, 170, m3, 20)
+		qp.drawRect(242, 170, self.m3, 20)
 		# Tilt claw:
-		qp.drawRect(230, 123, 20, m4)
+		qp.drawRect(230, 123, 20, self.m4)
 		# Open/close claw
-		qp.drawRect(330, 126, 20, m5)
+		qp.drawRect(330, 126, 20, self.m5)
 		
 		qp.end()
 
