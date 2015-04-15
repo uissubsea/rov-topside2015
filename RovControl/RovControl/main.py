@@ -166,8 +166,6 @@ class MainWidget(QtGui.QMainWindow):
 
     def open_controllerConfig(self):
         self.cnfigWindow = cntrconfig2.ConfigWindow()
-        self.subwindow2.setWidget(self.cnfigWindow)
-        self.ui.mdiArea.addSubWindow(self.subwindow2)
         self.cnfigWindow.show()
 
     def open_aboutUiSSubsea(self):

@@ -14,10 +14,11 @@ class ConfigWindow(QtGui.QWidget):
 		self.EXP_S_DEFAULT = 20
 		self.LIN_S_DEFAULT = 10
 
-		self.resize(680, 600)
+		#self.resize(680, 600)
 		self.setMinimumSize(680, 600)
 		self.setMaximumSize(680, 600)
 		self.setWindowTitle("Controller Settings")
+		self.center()
 
 		# Define tabwindow
 		self.tabwindow = QtGui.QTabWidget(self)
@@ -230,6 +231,13 @@ class ConfigWindow(QtGui.QWidget):
 
 	def addMaSensGBContents(self):
 		print("ejlrf")
+
+
+	def center(self):
+		qr = self.frameGeometry()
+		cp = QtGui.QDesktopWidget().availableGeometry().center()
+		qr.moveCenter(cp)
+		self.move(qr.topLeft())
 		
 ################################################################################
 #   BUTTON HANDLERS --- class ConfigWindow()
@@ -248,7 +256,6 @@ class ConfigWindow(QtGui.QWidget):
 	
 
 	def cancelButtonHandler(self):
-		print("Cancel pressed")
 		self.close()
 
 
@@ -266,6 +273,7 @@ class ConfigWindow(QtGui.QWidget):
 	def updateSliders(self):
 		self.linSliderValue.setText(str(self.linSlider.value()))
 		self.expSliderValue.setText(str(self.expSlider.value()))
+		
 ################################################################################
 #   MAIN
 ################################################################################

@@ -6,14 +6,14 @@ pluss evnt. tidshistorikk x antall målinger/tidsenheter tilbake i tid.
 import sys
 from PyQt4 import QtGui, QtCore
 from pyqtgraph import PlotWidget as pw
+# bruk joystick som tester for real-time plott fram til sensor kobles til :)
+
 
 class DepthWidget(QtGui.QWidget):
 
 	def __init__(self):
 		super(DepthWidget, self).__init__()
 
-		# init. fila som leser data fra ROV
-		# self.readPressure = ...
 
 		self.initUI()
 
@@ -26,11 +26,30 @@ class DepthWidget(QtGui.QWidget):
 		self.setMaximumSize (w, h)
 		self.setMinimumSize(w, h)
 		self.setWindowTitle('Depth Data')
-		#self.show() #remove when adding to main window!
+		
+		self.pressureLabel = QtGui.QLabel("0", self)
+		self.pressureLabel.setGeometry(10,120,50,20)
+		self.button = QtGui.QPushButton('User input', self)
+		self.button.setGeometry(160, 120, 80, 20)
+		self.button.clicked.connect(self.openDialog)
+
+		self.show() #!!
+
+
+	def openDialog(self):
+		self.y, ok = QtGui.QInputDialog.getDouble(self, 'Input Dialog', 
+			'Enter y value:')
+        
+		if ok:
+			self.pressureLabel.setText(str(self.y))
+
+
+	def addPlotItem(self):
+		self.plotItem = pyqtgraph.PlotItem()
+
 
 	def getPressure(self):
-		# self.pressure = self.readPressure.getValue()
-		self.pressure = 2.1
+		self.pressure = self.y
 		return self.pressure
 
 
