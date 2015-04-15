@@ -65,7 +65,7 @@ class NetworkClient():
 			self.axis_data = self.ctrl.ctrl_adata
 			self.button_data = self.ctrl.ctrl_bdata
 
-			print(self.axis_data)
+			#print(self.axis_data)
 			# Only send data if controller status changed
 			if (self.ctrl.changed):
 
@@ -80,10 +80,14 @@ class NetworkClient():
 				## Receive back from ROV and log
 				self.old = self.axis_data
 
+				self.data = self.sock.recv(128)
+
+				print(self.data, "\r", end="")
+
 			#self.data = self.sock.recv(128)
 			time.sleep(0.05)
 			
-			#print(self.data, "\r", end="")
+			
 
 
 	def open_controller(self):
