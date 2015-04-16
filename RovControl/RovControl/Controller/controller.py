@@ -24,6 +24,8 @@ class Controller(QtCore.QThread):
 		self.config = configparser.ConfigParser()
 		self.config.read('Config/controller.cfg')
 
+		self.inSettings = False
+
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
 
 		sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
@@ -31,35 +33,43 @@ class Controller(QtCore.QThread):
 		#Default values
 		self.DEAD_ZONE = 100
 		self.CONTROLLER_SMOOTH = 100
-
-		# Create thread
-
-		# Try to open joystick
-
-		self.open_controller()
 		
 		# Stores value from axis no. i in ctrl_axisdata[i]
 		self.ctrl_axisdata = [0]
 		# Stores value from button no. i in ctrl_buttondata[i]
 		self.ctrl_buttondata = [0]
 
-		self.start()
-
 
 
 	def run(self):
 
+		# Try to open joystick
+		self.open_controller()
+		
 		# Get events
-		self.running = True
-		while(self.running):
-			self.events = sdl2.ext.get_events()
-			self.changed = False
-			for event in self.events:
-				self.handle_events(event)
-			#self.changed = False
-			#print(self.ctrl_axisdata)
+		if self.inSettings == False:
 
-			time.sleep(0.05)
+			self.running = True
+			while(self.running):
+				self.events = sdl2.ext.get_events()
+				self.changed = False
+				for event in self.events:
+					self.handle_events(event)
+				#self.changed = False
+				#print(self.ctrl_axisdata)
+
+				time.sleep(0.05)
+		else:
+			self.running = True
+			while(self.running):
+				self.events = sdl2.ext.get_events()
+				self.changed = False
+				for event in self.events:
+					self.handle_SettingEvents(event)
+				#self.changed = False
+				#print(self.ctrl_axisdata)
+
+				time.sleep(0.05)
 
 
 	def handle_events(self, event):
@@ -98,6 +108,53 @@ class Controller(QtCore.QThread):
 			self.changed = True
 			for i in range(self.num_btns):
 				if event.jbutton.button == i:
+					self.ctrl_buttondata[i] = event.jbutton.state
+				#print("Key pressed")
+				#self.running = False
+		# Other Events
+
+	def handle_SettingEvents(self, event):
+		# If Controller Event
+		if event.type == sdl2.SDL_JOYDEVICEADDED:
+			# Open connected joystick
+			self.open_controller()
+
+		elif event.type == sdl2.SDL_JOYAXISMOTION:
+			self.changed = True
+			for i in range(self.num_axes): 
+				
+				if event.jaxis.axis == i:
+					# Left- right movement (x)
+					value = int(event.jaxis.value/self.CONTROLLER_SMOOTH)
+					
+					if (value > -self.DEAD_ZONE and value < self.DEAD_ZONE):
+						#Inside Dead zone
+						self.ctrl_axisdata[i] = 0
+
+					elif (value < -self.DEAD_ZONE):
+						value = value + self.DEAD_ZONE
+						if (value < -1000):
+							self.ctrl_axisdata[i] = -1000
+						else:
+							self.ctrl_axisdata[i] = value
+							# Emit Axis changed signal to Qt
+							self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(i))
+					
+					elif (value > self.DEAD_ZONE):
+						value = value - self.DEAD_ZONE
+						if (value > 1000):
+							self.ctrl_axisdata[i] = 1000
+						else:
+							self.ctrl_axisdata[i] = value
+							# Emit Axis changed signal to Qt
+							self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(i))
+
+
+		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
+			self.changed = True
+			for i in range(self.num_btns):
+				if event.jbutton.button == i:
+					self.emit(QtCore.SIGNAL('setText(Qstring)'), "Button" + str(i))
 					self.ctrl_buttondata[i] = event.jbutton.state
 				#print("Key pressed")
 				#self.running = False
@@ -185,10 +242,7 @@ class Controller(QtCore.QThread):
 
 		print("Done calibrating")
 
-
-def main():
-
-	ctrl = Controller()
-
-if __name__ == '__main__':
-    main()
+	def closeController(self):
+		# Close controller and stop thread
+		sdl2.SDL_JoystickClose(self.ctrl)
+		print("Closed controller %s" %(self.ctrl_name))

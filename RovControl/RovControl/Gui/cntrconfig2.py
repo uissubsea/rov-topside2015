@@ -2,11 +2,16 @@ import sys
 import time
 from PyQt4 import QtCore, QtGui
 from pyqtgraph import PlotWidget
+from Controller import controller
 
 class ConfigWindow(QtGui.QWidget):
 
 	def __init__(self):
 		super(ConfigWindow, self).__init__()
+		self.ctrl = controller.Controller()
+		self.ctrl.inSettings = True
+		self.ctrl.start()
+
 		self.initUI()
 
 
@@ -96,7 +101,8 @@ class ConfigWindow(QtGui.QWidget):
 
 		# Add key inputs:
 		self.thUp_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thUp_key.setGeometry(130, 30, 41, 20) 
+		self.thUp_key.setGeometry(130, 30, 41, 20)
+		self.thUp_key.connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.thUp_key.setText)
 		self.thDown_key = QtGui.QLineEdit(self.thrusterGB)
 		self.thDown_key.setGeometry(130, 60, 41, 20)
 		self.thReverse_key = QtGui.QLineEdit(self.thrusterGB)
@@ -256,6 +262,7 @@ class ConfigWindow(QtGui.QWidget):
 	
 
 	def cancelButtonHandler(self):
+		self.ctrl.closeController()
 		self.close()
 
 

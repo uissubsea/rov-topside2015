@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'RESOURCES/MainWindow.ui'
+# Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Mon Apr 13 14:18:32 2015
+# Created: Thu Apr 16 14:03:31 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,14 +50,17 @@ class Ui_MainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
+        self.toolBar = QtGui.QToolBar(MainWindow)
+        self.toolBar.setObjectName(_fromUtf8("toolBar"))
+        MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.actionExit = QtGui.QAction(MainWindow)
         self.actionExit.setObjectName(_fromUtf8("actionExit"))
         self.actionCamera_1 = QtGui.QAction(MainWindow)
         self.actionCamera_1.setObjectName(_fromUtf8("actionCamera_1"))
         self.actionCamera_2 = QtGui.QAction(MainWindow)
         self.actionCamera_2.setObjectName(_fromUtf8("actionCamera_2"))
-        #self.actionOptions = QtGui.QAction(MainWindow)
-        #self.actionOptions.setObjectName(_fromUtf8("actionOptions"))
+        self.actionOptions = QtGui.QAction(MainWindow)
+        self.actionOptions.setObjectName(_fromUtf8("actionOptions"))
         self.actionStatus = QtGui.QAction(MainWindow)
         self.actionStatus.setObjectName(_fromUtf8("actionStatus"))
         self.actionPOD_1 = QtGui.QAction(MainWindow)
@@ -76,13 +79,20 @@ class Ui_MainWindow(object):
         self.actionDepth_sensor.setObjectName(_fromUtf8("actionDepth_sensor"))
         self.actionUiS_Subsea = QtGui.QAction(MainWindow)
         self.actionUiS_Subsea.setObjectName(_fromUtf8("actionUiS_Subsea"))
-        self.actionAboutROV = QtGui.QAction(MainWindow)
-        self.actionAboutROV.setObjectName(_fromUtf8("actionAboutROV"))
+        self.actionNjord_v_2_8_1_beta = QtGui.QAction(MainWindow)
+        self.actionNjord_v_2_8_1_beta.setObjectName(_fromUtf8("actionNjord_v_2_8_1_beta"))
         self.actionOption = QtGui.QAction(MainWindow)
         self.actionOption.setObjectName(_fromUtf8("actionOption"))
+        self.actionConnect = QtGui.QAction(MainWindow)
+        self.actionConnect.setObjectName(_fromUtf8("actionConnect"))
+        self.actionDisconnect = QtGui.QAction(MainWindow)
+        self.actionDisconnect.setObjectName(_fromUtf8("actionDisconnect"))
+        self.menuFile.addAction(self.actionConnect)
+        self.menuFile.addAction(self.actionDisconnect)
+        self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuAbout.addAction(self.actionUiS_Subsea)
-        self.menuAbout.addAction(self.actionAboutROV)
+        self.menuAbout.addAction(self.actionNjord_v_2_8_1_beta)
         self.menuView.addAction(self.actionCamera_1)
         self.menuView.addAction(self.actionCamera_2)
         self.menuView.addAction(self.actionCamera_3)
@@ -102,6 +112,9 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
+        self.toolBar.addAction(self.actionConnect)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actionDisconnect)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -112,12 +125,13 @@ class Ui_MainWindow(object):
         self.menuAbout.setTitle(_translate("MainWindow", "About", None))
         self.menuView.setTitle(_translate("MainWindow", "View", None))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings", None))
+        self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar", None))
         self.actionExit.setText(_translate("MainWindow", "Exit", None))
         self.actionExit.setToolTip(_translate("MainWindow", "Exit the application", None))
         self.actionExit.setShortcut(_translate("MainWindow", "Ctrl+Q", None))
         self.actionCamera_1.setText(_translate("MainWindow", "Camera 1", None))
         self.actionCamera_2.setText(_translate("MainWindow", "Camera 2", None))
-        #self.actionOptions.setText(_translate("MainWindow", "Options", None))
+        self.actionOptions.setText(_translate("MainWindow", "Options", None))
         self.actionStatus.setText(_translate("MainWindow", "Status", None))
         self.actionPOD_1.setText(_translate("MainWindow", "POD 1", None))
         self.actionPOD_2.setText(_translate("MainWindow", "POD 2", None))
@@ -127,6 +141,8 @@ class Ui_MainWindow(object):
         self.actionThursters.setText(_translate("MainWindow", "Thursters", None))
         self.actionDepth_sensor.setText(_translate("MainWindow", "Depth sensor", None))
         self.actionUiS_Subsea.setText(_translate("MainWindow", "UiS Subsea", None))
-        self.actionAboutROV.setText(_translate("MainWindow", "Njord v.2.8.1 beta", None))
+        self.actionNjord_v_2_8_1_beta.setText(_translate("MainWindow", "Njord v.2.8.1 beta", None))
         self.actionOption.setText(_translate("MainWindow", "Options", None))
+        self.actionConnect.setText(_translate("MainWindow", "Connect", None))
+        self.actionDisconnect.setText(_translate("MainWindow", "Disconnect", None))
 

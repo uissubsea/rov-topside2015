@@ -32,15 +32,17 @@ class NetworkClient(QtCore.QThread):
 		self.rov_data = ["0","0","0","0","0"]
 
 		self.ctrl = controller.Controller()
-		self.ctrl.start()
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 
-		self.old = 0
+		self.running = True
+
 
 
 	def run(self):
+		# Start controller thread
+		self.ctrl.start()
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -56,7 +58,7 @@ class NetworkClient(QtCore.QThread):
 
 		# Thread Loop
 
-		while True:	
+		while self.running:	
 			
 			# Get newest Joystick data
 
@@ -72,8 +74,6 @@ class NetworkClient(QtCore.QThread):
 				#print(self.str, "\r", end="")
 
 				self.sock.sendall(bytes(self.str, 'UTF-8'))
-				#self.sock.sendall(bytes(b"heywww - 2test"))
-				#print("data sendt");
 
 				## Receive back from ROV and log
 				self.old = self.axis_data
@@ -84,9 +84,12 @@ class NetworkClient(QtCore.QThread):
 
 			#self.data = self.sock.recv(128)
 			time.sleep(0.05)
-			
-			
 
+		# Disconnect from server
+		self.sock.close()
+		self.ctrl.closeController()
+		print("Disconnected from server, Goodbye")
+			
 
 	def open_controller(self):
 		sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
@@ -103,10 +106,5 @@ class NetworkClient(QtCore.QThread):
 
 		return string
 
-	def stop(self):
-		self.sock.close()
-		sys.exit
-
-
-
-
+	def disconnect(self):
+		self.running = False

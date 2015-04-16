@@ -111,7 +111,7 @@ class MainWidget(QtGui.QMainWindow):
         self.ui.actionOption.triggered.connect(self.open_options)
         self.ui.actionController.triggered.connect(self.open_controllerConfig)
         self.ui.actionUiS_Subsea.triggered.connect(self.open_aboutUiSSubsea)
-        self.ui.actionAboutROV.triggered.connect(self.open_aboutROV)
+        #self.ui.actionAboutROV.triggered.connect(self.open_aboutROV)
         #   --> integrated widgets:
         self.ui.actionCamera_1.triggered.connect(self.open_cam1)
         self.ui.actionCamera_2.triggered.connect(self.open_cam2)
@@ -124,6 +124,9 @@ class MainWidget(QtGui.QMainWindow):
         self.ui.actionDepth_sensor.triggered.connect(self.open_depthWidget)
         
         self.ui.actionExit.triggered.connect(self.exit)
+
+        self.ui.actionConnect.triggered.connect(self.connect)
+        self.ui.actionDisconnect.triggered.connect(self.disconnect)
 
         self.show()
 
@@ -141,9 +144,7 @@ class MainWidget(QtGui.QMainWindow):
         self.subwindow12 = QtGui.QMdiSubWindow()
         self.subwindow13 = QtGui.QMdiSubWindow()
 
-        # Start Network Client
         self.netClient = networkclient.NetworkClient()
-        self.netClient.start()
         
 
     def open_logFile(self):
@@ -237,10 +238,19 @@ class MainWidget(QtGui.QMainWindow):
         self.ui.mdiArea.addSubWindow(self.subwindow13)
         self.depthWindow.show()
 
+    def connect(self):
+        #Start Network Client
+        self.netClient.start()
+        #self.open_statusWindow()
+
+    def disconnect(self):
+        # Stop Network client
+        self.netClient.disconnect()
+
 
     def exit(self):
         # Stop Network client
-        self.netClient.stop()
+        self.netClient.disconnect()
         self.close()
         print("Stopped?")
         sys.exit()
