@@ -8,6 +8,7 @@ import socket
 import threading
 import time
 from Controller import controller
+from PyQt4 import QtCore
 
 import logging
 
@@ -24,25 +25,22 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
-class NetworkClient():
+class NetworkClient(QtCore.QThread):
 	def __init__(self, address="192.168.1.20", port=50000):
+		super(NetworkClient, self).__init__()
+
 		self.rov_data = ["0","0","0","0","0"]
 
 		self.ctrl = controller.Controller()
+		self.ctrl.start()
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 
-		self._stop = threading.Event()
-
 		self.old = 0
 
-		#Create thread to run
-		self.thread = threading.Thread(target = self.start_client)
-		self.thread.start()
 
-
-	def start_client(self):
+	def run(self):
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -58,12 +56,12 @@ class NetworkClient():
 
 		# Thread Loop
 
-		while not self._stop.isSet():	
+		while True:	
 			
 			# Get newest Joystick data
 
-			self.axis_data = self.ctrl.ctrl_adata
-			self.button_data = self.ctrl.ctrl_bdata
+			self.axis_data = self.ctrl.ctrl_axisdata
+			self.button_data = self.ctrl.ctrl_buttondata
 
 			#print(self.axis_data)
 			# Only send data if controller status changed
@@ -106,7 +104,6 @@ class NetworkClient():
 		return string
 
 	def stop(self):
-		self._stop.set()
 		self.sock.close()
 		sys.exit
 

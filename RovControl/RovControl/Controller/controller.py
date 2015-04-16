@@ -11,13 +11,15 @@ import sdl2.ext
 import threading
 import time
 import configparser
+from PyQt4 import QtCore
 
 
 CIRCLE = True
 
-class Controller(object):
+class Controller(QtCore.QThread):
 
 	def __init__(self):
+		super(Controller, self).__init__()
 
 		self.config = configparser.ConfigParser()
 		self.config.read('Config/controller.cfg')
@@ -41,11 +43,11 @@ class Controller(object):
 		# Stores value from button no. i in ctrl_buttondata[i]
 		self.ctrl_buttondata = [0]
 
-		self.thread = threading.Thread(target = self.controller_loop)
-		self.thread.start()
+		self.start()
 
 
-	def controller_loop(self):
+
+	def run(self):
 
 		# Get events
 		self.running = True

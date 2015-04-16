@@ -143,6 +143,7 @@ class MainWidget(QtGui.QMainWindow):
 
         # Start Network Client
         self.netClient = networkclient.NetworkClient()
+        self.netClient.start()
         
 
     def open_logFile(self):
