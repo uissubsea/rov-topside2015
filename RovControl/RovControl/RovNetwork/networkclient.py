@@ -31,20 +31,33 @@ class NetworkClient(QtCore.QThread):
 
 		self.rov_data = ["0","0","0","0","0"]
 
-		self.ctrl = []
-		self.ctrl.append(controller.Controller())
+		self.ctrl1 = controller.Controller()
+		self.ctrl2 = controller.Controller()
+
+		self.controllers = []
+		self.controllers.append(self.ctrl1)
+		self.controllers.append(self.ctrl2)
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 
+
 		self.running = True
 
-
+	def init_controllers(self):
+		self.numOfControllers = len(self.controllers)
+		# Create Array to hold thruster and manipulator data
+		self.controllerData = [None] * self.numOfControllers
+		
+		# Open Controllers and start threads
+		for i in range(self.numOfControllers):
+			self.controllers[i].open_controller(i)
+			self.controllers[i].start()
 
 	def run(self):
 		# Start controller thread
-		self.ctrl[0].open_controller(0)
-		self.ctrl[0].start()
+
+		self.init_controllers()
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -63,26 +76,26 @@ class NetworkClient(QtCore.QThread):
 		while self.running:	
 			
 			# Get newest Joystick data
+			for i in range(self.numOfControllers):
+				self.controllerData[i] = self.controllers[i].ctrl_axisdata
+				self.controllerData[i] = self.controllers[i].ctrl_buttondata
 
-			self.axis_data = self.ctrl[0].ctrl_axisdata
-			self.button_data = self.ctrl[0].ctrl_buttondata
-
-			#print(self.axis_data)
+			print(self.controllerData[0])
 			# Only send data if controller status changed
-			if (self.ctrl[0].changed):
+			if self.controllers[0].changed or self.controllers[1].changed:
 
-				self.str = self.serialize(self.axis_data)
+				self.str = self.serialize(self.controllerData)
 
-				#print(self.str, "\r", end="")
+				print(self.str, "\r", end="")
 
 				self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 				# Receive Data from ROV and log
 
 				self.data = self.sock.recv(128)
-				self.parse_data(self.data.decode("UTF-8"))
+				#self.parse_data(self.data.decode("UTF-8"))
 
-				print(self.data, "\r", end="")
+				#print(self.data, "\r", end="")
 
 			#self.data = self.sock.recv(128)
 			time.sleep(0.05)
@@ -106,8 +119,11 @@ class NetworkClient(QtCore.QThread):
 		# Create ASCII string to contain data
 		string = ""
 		# Loop through first 4 data. Assume they are thruster values
-		for i in range(4):
-			string += str(rov_data[i]) + ","
+		# Add data from both controllers
+		for i in range(len(rov_data)):
+			for j in range(len(rov_data[i])):
+				string = string + str(rov_data[i][j]) + ","
+	
 		
 		#string += ";"
 
