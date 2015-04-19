@@ -44,7 +44,7 @@ class Controller(QtCore.QThread):
 	def run(self):
 
 		# Try to open joystick
-		self.open_controller()
+		#self.open_controller()
 		
 		# Get events
 		if self.inSettings == False:
@@ -161,10 +161,14 @@ class Controller(QtCore.QThread):
 		# Other Events
 
 
-	def open_controller(self):
+	def open_controller(self, index = None):
 		self.num_ctrl = sdl2.SDL_NumJoysticks()
 		if self.num_ctrl != 0:
-			self.ctrl = sdl2.SDL_JoystickOpen(self.num_ctrl - 1)
+			if index is None:
+				self.ctrl = sdl2.SDL_JoystickOpen(self.num_ctrl - 1)
+			else:
+				self.ctrl = sdl2.SDL_JoystickOpen(index)
+
 			self.ctrl_name = sdl2.SDL_JoystickName(self.ctrl)
 			print("Opened controller %s" %(self.ctrl_name))
 
@@ -186,15 +190,14 @@ class Controller(QtCore.QThread):
 					print("Error getting config values")
 
 		else:
-			print("No Controller detected!, Connect now")
+			print("No Controller detected, Connect now")
 
+	def connected_controllers(self):
+		controllerList = []
+		for i in range(self.num_ctrl):
+			controllerList.append(str(sdl2.SDL_JoystickNameForIndex(i)))
 
-	def get_buttonData(self):
-		return self.ctrl_buttondata
-
-
-	def get_axisData(self):
-		return self.ctrl_axisdata
+		return controllerList
 
 
 	def calibrate(self):

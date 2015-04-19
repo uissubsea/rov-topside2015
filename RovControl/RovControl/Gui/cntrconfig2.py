@@ -3,6 +3,7 @@ import time
 from PyQt4 import QtCore, QtGui
 from pyqtgraph import PlotWidget
 from Controller import controller
+import configparser
 
 class ConfigWindow(QtGui.QWidget):
 
@@ -10,6 +11,15 @@ class ConfigWindow(QtGui.QWidget):
 		super(ConfigWindow, self).__init__()
 		self.ctrl = controller.Controller()
 		self.ctrl.inSettings = True
+
+		self.config = configparser.ConfigParser()
+		self.config.read('../Config/controller.cfg')
+
+		self.thrustButtons = []
+		self.thrustFields = []
+		self.manipButtons = []
+		self.manipFields = []
+
 		self.ctrl.start()
 
 		self.initUI()
@@ -28,12 +38,14 @@ class ConfigWindow(QtGui.QWidget):
 		# Define tabwindow
 		self.tabwindow = QtGui.QTabWidget(self)
 		self.tabwindow.setGeometry(20, 10, 641, 531)
+
 		#self.tabwindow.usesScrollButtons(False)
 		#self.tabWindow.setCurrentIndex(1)
 		self.addKeyTab()
 		self.addControllerTab()
 		self.addSensTab()
 		self.addMainButtons()
+		self.addControllerBox()
 
 		self.show()
 		
@@ -51,6 +63,13 @@ class ConfigWindow(QtGui.QWidget):
 		self.resetButton.setGeometry(14, 550, 91, 32)
 		self.resetButton.clicked.connect(self.resetButtonHandler)
 
+	def addControllerBox(self):
+		self.combo = QtGui.QComboBox(self)
+		controllerList = self.ctrl.connected_controllers()
+		for i in range(len(controllerList)):
+			self.combo.addItem(controllerList[i])
+
+		self.combo.move(100, 550)
 
 
 	def addKeyTab(self):
@@ -90,33 +109,23 @@ class ConfigWindow(QtGui.QWidget):
 
 	def addThrusterGBContents(self):
 		# Add labels:
-		text = ['Up', 'Down', 'Forward', 'Reverse', 
+		self.thrusterLabels = ['Up/Down', 'Left/Right', 'Forward/Reverse', 'Rotate', 
 					'Right', 'Left', 'Rotate CW', 'Rotate CCW']
 		xpos = [20, 20, 20, 20, 220, 220, 220, 220]
 		ypos = [30, 60, 90, 120, 30, 60, 90, 120]
 
-		for i in range(len(text)):
-			self.label = QtGui.QLabel(text[i], self.thrusterGB)
-			self.label.setGeometry(xpos[i], ypos[i], 75, 20)
+		for i in range(len(self.thrusterLabels)):
+			self.thrustButtons.append(QtGui.QPushButton(self.thrusterLabels[i], self.thrusterGB))
+			self.thrustButtons[i].setGeometry(xpos[i], ypos[i], 75, 20)
+			self.thrustButtons[i].setCheckable(True)
 
-		# Add key inputs:
-		self.thUp_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thUp_key.setGeometry(130, 30, 41, 20)
-		self.thUp_key.connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.thUp_key.setText)
-		self.thDown_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thDown_key.setGeometry(130, 60, 41, 20)
-		self.thReverse_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thReverse_key.setGeometry(130, 120, 41, 20)
-		self.thForward_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thForward_key.setGeometry(130, 90, 41, 20)
-		self.thRight_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thRight_key.setGeometry(330, 30, 41, 20)
-		self.thLeft_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thLeft_key.setGeometry(330, 60, 41, 20)
-		self.thRotateCCW_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thRotateCCW_key.setGeometry(330, 120, 41, 20)
-		self.thRotateCW_key = QtGui.QLineEdit(self.thrusterGB)
-		self.thRotateCW_key.setGeometry(330, 90, 41, 20)
+		xpos = [130, 130, 130, 130, 330, 330, 330, 330]
+		ypos = [30, 60, 90, 120, 30, 60, 90, 120]
+
+		for i in range(8):
+			self.thrustFields.append(QtGui.QLineEdit(self.thrusterGB))
+			self.thrustFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
+			self.thrustFields[i].connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.setField)
 
 		# Add illustration:
 		self.thImg = QtGui.QLabel(self.thrusterGB)
@@ -125,6 +134,19 @@ class ConfigWindow(QtGui.QWidget):
 		rov = QtGui.QPixmap('RESOURCES/skrog.jpg') 
 		#oppdater bilde, og fiks adresse når widget kobles opp mot main!
 		self.thImg.setPixmap(rov)
+
+	def setField(self, axis):
+		# Loop through array to check which field should be set
+			for i in range(8):
+				if self.thrustButtons[i].isChecked():
+					self.thrustFields[i].setText(axis)
+					self.thrustButtons[i].setChecked(False)
+
+			for i in range(10):
+				if self.manipButtons[i].isChecked():
+					self.manipFields[i].setText(axis)
+					self.manipButtons[i].setChecked(False)
+
 
 
 	def addManipulatorGBContents(self):
@@ -136,31 +158,19 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 90, 120, 150, 180, 30, 60, 90, 120]
 
 		for i in range(len(text)):
-			self.label = QtGui.QLabel(text[i], self.manipulatorGB)
-			self.label.setGeometry(xpos[i], ypos[i], 110, 20)
+			self.manipButtons.append(QtGui.QPushButton(text[i], self.manipulatorGB))
+			self.manipButtons[i].setGeometry(xpos[i], ypos[i], 110, 20)
+			self.manipButtons[i].setCheckable(True)
 
-		# Add key inputs:
-		self.mcRotateCCW = QtGui.QLineEdit(self.manipulatorGB)
-		self.mcRotateCCW.setGeometry(130, 120, 41, 20)
-		self.mcRotateCW_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.mcRotateCW_key.setGeometry(130, 90, 41, 20)
-		self.mcGrip_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.mcGrip_key.setGeometry(130, 60, 41, 20)
-		self.mcOpen_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.mcOpen_key.setGeometry(130, 30, 41, 20)
-		self.mcUp_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.mcUp_key.setGeometry(130, 150, 41, 20)
-		self.mcDown_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.mcDown_key.setGeometry(130, 180, 41, 20)
-		self.maRaise_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maRaise_key.setGeometry(330, 30, 41, 20)
-		self.maLower_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maLower_key.setGeometry(330, 60, 41, 20)
-		self.maBend_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maBend_key.setGeometry(330, 90, 41, 20)
-		self.maStretch_key = QtGui.QLineEdit(self.manipulatorGB)
-		self.maStretch_key.setGeometry(330, 120, 41, 20)
-
+		xpos = [130, 130, 130, 130, 130, 130, 330, 330, 330, 330]
+		ypos = [120, 90, 60, 30, 150, 180, 30, 60, 41, 41]
+		
+		# Add Manipulator text fields to GUI
+		for i in range(10): 
+			self.manipFields.append(QtGui.QLineEdit(self.manipulatorGB))
+			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
+			self.manipFields[i].connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.setField)
+		
 		# Add illustration:
 		self.maImg = QtGui.QLabel(self.manipulatorGB)
 		self.maImg.setScaledContents(True)
@@ -267,7 +277,14 @@ class ConfigWindow(QtGui.QWidget):
 
 
 	def applyButtonHandler(self):
-		print("Apply pressed")
+		print("Settings Written to config")
+		for i in range(4):
+			self.config[str(self.ctrl.ctrl_name)][self.thrusterLabels[i]] = self.thrustFields[i]
+
+		with open('../Config/controller.cfg', 'w') as configfile:
+			self.config.write(configfile)
+
+
 
 
 	def resetButtonHandler(self):

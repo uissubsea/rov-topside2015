@@ -31,7 +31,8 @@ class NetworkClient(QtCore.QThread):
 
 		self.rov_data = ["0","0","0","0","0"]
 
-		self.ctrl = controller.Controller()
+		self.ctrl = []
+		self.ctrl.append(controller.Controller())
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
@@ -42,7 +43,8 @@ class NetworkClient(QtCore.QThread):
 
 	def run(self):
 		# Start controller thread
-		self.ctrl.start()
+		self.ctrl[0].open_controller(0)
+		self.ctrl[0].start()
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -62,12 +64,12 @@ class NetworkClient(QtCore.QThread):
 			
 			# Get newest Joystick data
 
-			self.axis_data = self.ctrl.ctrl_axisdata
-			self.button_data = self.ctrl.ctrl_buttondata
+			self.axis_data = self.ctrl[0].ctrl_axisdata
+			self.button_data = self.ctrl[0].ctrl_buttondata
 
 			#print(self.axis_data)
 			# Only send data if controller status changed
-			if (self.ctrl.changed):
+			if (self.ctrl[0].changed):
 
 				self.str = self.serialize(self.axis_data)
 
@@ -75,10 +77,10 @@ class NetworkClient(QtCore.QThread):
 
 				self.sock.sendall(bytes(self.str, 'UTF-8'))
 
-				## Receive back from ROV and log
-				self.old = self.axis_data
+				# Receive Data from ROV and log
 
 				self.data = self.sock.recv(128)
+				self.parse_data(self.data.decode("UTF-8"))
 
 				print(self.data, "\r", end="")
 
@@ -87,8 +89,13 @@ class NetworkClient(QtCore.QThread):
 
 		# Disconnect from server
 		self.sock.close()
-		self.ctrl.closeController()
+		self.ctrl[0].closeController()
 		print("Disconnected from server, Goodbye")
+
+	def parse_data(self, stringtoparse):
+		output = stringtoparse
+		#output.split("_")
+		print(output)
 			
 
 	def open_controller(self):
