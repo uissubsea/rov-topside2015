@@ -105,16 +105,7 @@ class NetworkClient(QtCore.QThread):
 		#sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
 		sdl2.SDL_JoystickOpen(0)
 
-	def serialize(self, rov_data):
-		# Create ASCII string to contain data
-		string = ""
-		# Loop through first 4 data. Assume they are thruster values
-		for i in range(4):
-			string += str(rov_data[i]) + ","
-		
-		#string += ";"
 
-		return string
 
 	def disconnect(self):
 		self.running = False
