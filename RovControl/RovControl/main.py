@@ -144,6 +144,7 @@ class MainWidget(QtGui.QMainWindow):
         self.subwindow12 = QtGui.QMdiSubWindow()
         self.subwindow13 = QtGui.QMdiSubWindow()
 
+        # Network Client Thread
         self.netClient = networkclient.NetworkClient()
         
 

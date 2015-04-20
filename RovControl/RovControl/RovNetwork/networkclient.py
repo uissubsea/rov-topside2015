@@ -31,6 +31,7 @@ class NetworkClient(QtCore.QThread):
 
 		self.rov_data = ["0","0","0","0","0"]
 
+<<<<<<< HEAD
 		self.ctrl1 = controller.Controller()
 		self.ctrl2 = controller.Controller()
 
@@ -38,11 +39,22 @@ class NetworkClient(QtCore.QThread):
 		self.controllers.append(self.ctrl1)
 		self.controllers.append(self.ctrl2)
 
+=======
+>>>>>>> old-state
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 
 
+<<<<<<< HEAD
 		self.running = True
+=======
+		# Create List of controller threads
+
+		self.control = controller.Controller()
+		self.control.start()
+
+
+>>>>>>> old-state
 
 	def init_controllers(self):
 		self.numOfControllers = len(self.controllers)
@@ -56,8 +68,11 @@ class NetworkClient(QtCore.QThread):
 
 	def run(self):
 		# Start controller thread
+<<<<<<< HEAD
 
 		self.init_controllers()
+=======
+>>>>>>> old-state
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -80,6 +95,7 @@ class NetworkClient(QtCore.QThread):
 				self.controllerData[i] = self.controllers[i].ctrl_axisdata
 				self.controllerData[i] = self.controllers[i].ctrl_buttondata
 
+<<<<<<< HEAD
 			print(self.controllerData[0])
 			# Only send data if controller status changed
 			if self.controllers[0].changed or self.controllers[1].changed:
@@ -87,6 +103,20 @@ class NetworkClient(QtCore.QThread):
 				self.str = self.serialize(self.controllerData)
 
 				print(self.str, "\r", end="")
+=======
+			self.axis_data = self.control.axisData
+			self.button_data = self.control.axisData
+
+			#print(self.axis_data)
+			# Only send data if controller status changed
+			if (self.control.changed):
+
+				##self.axis_data[0][2] = self.axis_data[0][2] + 670
+
+				self.str = self.serialize(self.axis_data[0])
+
+				print(self.str)
+>>>>>>> old-state
 
 				self.sock.sendall(bytes(self.str, 'UTF-8'))
 
@@ -102,17 +132,17 @@ class NetworkClient(QtCore.QThread):
 
 		# Disconnect from server
 		self.sock.close()
-		self.ctrl[0].closeController()
+		self.control.closeController()
 		print("Disconnected from server, Goodbye")
 
 	def parse_data(self, stringtoparse):
 		output = stringtoparse
 		#output.split("_")
-		print(output)
+		#print(output)
 			
 
 	def open_controller(self):
-		sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
+		#sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
 		sdl2.SDL_JoystickOpen(0)
 
 	def serialize(self, rov_data):
