@@ -31,20 +31,21 @@ class NetworkClient(QtCore.QThread):
 
 		self.rov_data = ["0","0","0","0","0"]
 
-		self.ctrl = []
-		self.ctrl.append(controller.Controller())
-
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 
 		self.running = True
 
+		# Create List of controller threads
+
+		self.control = controller.Controller()
+		self.control.start()
+
+
 
 
 	def run(self):
 		# Start controller thread
-		self.ctrl[0].open_controller(0)
-		self.ctrl[0].start()
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -64,42 +65,44 @@ class NetworkClient(QtCore.QThread):
 			
 			# Get newest Joystick data
 
-			self.axis_data = self.ctrl[0].ctrl_axisdata
-			self.button_data = self.ctrl[0].ctrl_buttondata
+			self.axis_data = self.control.axisData
+			self.button_data = self.control.axisData
 
 			#print(self.axis_data)
 			# Only send data if controller status changed
-			if (self.ctrl[0].changed):
+			if (self.control.changed):
 
-				self.str = self.serialize(self.axis_data)
+				##self.axis_data[0][2] = self.axis_data[0][2] + 670
 
-				#print(self.str, "\r", end="")
+				self.str = self.serialize(self.axis_data[0])
+
+				print(self.str)
 
 				self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 				# Receive Data from ROV and log
 
 				self.data = self.sock.recv(128)
-				self.parse_data(self.data.decode("UTF-8"))
+				#self.parse_data(self.data.decode("UTF-8"))
 
-				print(self.data, "\r", end="")
+				#print(self.data, "\r", end="")
 
 			#self.data = self.sock.recv(128)
 			time.sleep(0.05)
 
 		# Disconnect from server
 		self.sock.close()
-		self.ctrl[0].closeController()
+		self.control.closeController()
 		print("Disconnected from server, Goodbye")
 
 	def parse_data(self, stringtoparse):
 		output = stringtoparse
 		#output.split("_")
-		print(output)
+		#print(output)
 			
 
 	def open_controller(self):
-		sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
+		#sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
 		sdl2.SDL_JoystickOpen(0)
 
 	def serialize(self, rov_data):
