@@ -31,30 +31,17 @@ class NetworkClient(QtCore.QThread):
 
 		self.rov_data = ["0","0","0","0","0"]
 
-<<<<<<< HEAD
-		self.ctrl1 = controller.Controller()
-		self.ctrl2 = controller.Controller()
-
-		self.controllers = []
-		self.controllers.append(self.ctrl1)
-		self.controllers.append(self.ctrl2)
-
-=======
->>>>>>> old-state
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 
 
-<<<<<<< HEAD
 		self.running = True
-=======
+
 		# Create List of controller threads
 
 		self.control = controller.Controller()
 		self.control.start()
 
-
->>>>>>> old-state
 
 	def init_controllers(self):
 		self.numOfControllers = len(self.controllers)
@@ -68,11 +55,6 @@ class NetworkClient(QtCore.QThread):
 
 	def run(self):
 		# Start controller thread
-<<<<<<< HEAD
-
-		self.init_controllers()
-=======
->>>>>>> old-state
 
 		self.connected = False
 		logger.info("Connecting to ROV...")
@@ -90,20 +72,6 @@ class NetworkClient(QtCore.QThread):
 
 		while self.running:	
 			
-			# Get newest Joystick data
-			for i in range(self.numOfControllers):
-				self.controllerData[i] = self.controllers[i].ctrl_axisdata
-				self.controllerData[i] = self.controllers[i].ctrl_buttondata
-
-<<<<<<< HEAD
-			print(self.controllerData[0])
-			# Only send data if controller status changed
-			if self.controllers[0].changed or self.controllers[1].changed:
-
-				self.str = self.serialize(self.controllerData)
-
-				print(self.str, "\r", end="")
-=======
 			self.axis_data = self.control.axisData
 			self.button_data = self.control.axisData
 
@@ -116,13 +84,12 @@ class NetworkClient(QtCore.QThread):
 				self.str = self.serialize(self.axis_data[0])
 
 				print(self.str)
->>>>>>> old-state
 
-				self.sock.sendall(bytes(self.str, 'UTF-8'))
+				#self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 				# Receive Data from ROV and log
 
-				self.data = self.sock.recv(128)
+				#self.data = self.sock.recv(128)
 				#self.parse_data(self.data.decode("UTF-8"))
 
 				#print(self.data, "\r", end="")
