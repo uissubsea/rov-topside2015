@@ -43,15 +43,7 @@ class NetworkClient(QtCore.QThread):
 		self.control.start()
 
 
-	def init_controllers(self):
-		self.numOfControllers = len(self.controllers)
-		# Create Array to hold thruster and manipulator data
-		self.controllerData = [None] * self.numOfControllers
-		
-		# Open Controllers and start threads
-		for i in range(self.numOfControllers):
-			self.controllers[i].open_controller(i)
-			self.controllers[i].start()
+
 
 	def run(self):
 		# Start controller thread
@@ -72,6 +64,8 @@ class NetworkClient(QtCore.QThread):
 
 		while self.running:	
 			
+			# Get newest Joystick data
+
 			self.axis_data = self.control.axisData
 			self.button_data = self.control.axisData
 
@@ -85,11 +79,11 @@ class NetworkClient(QtCore.QThread):
 
 				print(self.str)
 
-				#self.sock.sendall(bytes(self.str, 'UTF-8'))
+				self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 				# Receive Data from ROV and log
 
-				#self.data = self.sock.recv(128)
+				self.data = self.sock.recv(128)
 				#self.parse_data(self.data.decode("UTF-8"))
 
 				#print(self.data, "\r", end="")
@@ -116,11 +110,8 @@ class NetworkClient(QtCore.QThread):
 		# Create ASCII string to contain data
 		string = ""
 		# Loop through first 4 data. Assume they are thruster values
-		# Add data from both controllers
-		for i in range(len(rov_data)):
-			for j in range(len(rov_data[i])):
-				string = string + str(rov_data[i][j]) + ","
-	
+		for i in range(4):
+			string += str(rov_data[i]) + ","
 		
 		#string += ";"
 
