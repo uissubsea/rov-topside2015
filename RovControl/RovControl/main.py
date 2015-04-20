@@ -171,14 +171,12 @@ class MainWidget(QtGui.QMainWindow):
         self.cnfigWindow.show()
 
     def open_aboutUiSSubsea(self):
-        self.uissubseaWindow = QtGui.QWidget()
-        self.ui3 = about.UiSSubsea()
-        self.subwindow3.setWidget(self.uissubseaWindow)
+        self.uissubseaWindow = about.UiSSubsea()
         self.uissubseaWindow.show()
     
     def open_aboutROV(self):
-        print("ROV")
-        # legg inn pop-up vindu med info :)
+        self.rovWindow = about.Vehicle()
+        self.rovWindow.show()
 
     def open_cam1(self):
         self.cam1Window = camerawindow.TestWindowCam1()
