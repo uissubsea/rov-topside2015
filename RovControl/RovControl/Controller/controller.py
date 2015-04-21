@@ -42,9 +42,9 @@ class Controller(QtCore.QThread):
 		self.axisData = []
 		self.buttonData = []
 
-		#Default values
-		self.DEAD_ZONE = 100
-		self.CONTROLLER_SMOOTH = 100
+		# Lists to hold Settings for connected Controllers
+		self.controllerDeadZone = []
+		self.controllerSmooth = []
 
 
 	def run(self):
@@ -93,24 +93,24 @@ class Controller(QtCore.QThread):
 					for j in range(self.controllerNumAxis[i]): 
 				
 						if event.jaxis.axis == j:
-							value = int(event.jaxis.value/self.CONTROLLER_SMOOTH)
+							value = int(event.jaxis.value/self.controllerSmooth[i])
 							# Left- right movement (x)
-							if event.jaxis.axis == 3:
-								value = value + 670
+							#if event.jaxis.axis == 2:
+							#	value = value + 670
 							
-							if (value > -self.DEAD_ZONE and value < self.DEAD_ZONE):
+							if (value > -self.controllerDeadZone[i] and value < self.controllerDeadZone[i]):
 								#Inside Dead zone
 								self.axisData[i][j] = 0
 
-							elif (value < -self.DEAD_ZONE):
-								value = value + self.DEAD_ZONE
+							elif (value < -self.controllerDeadZone[i]):
+								value = value + self.controllerDeadZone[i]
 								if (value < -1000):
 									self.axisData[i][j] = -1000
 								else:
 									self.axisData[i][j] = value
 					
-							elif (value > self.DEAD_ZONE):
-								value = value - self.DEAD_ZONE
+							elif (value > self.controllerDeadZone[i]):
+								value = value - self.controllerDeadZone[i]
 								if (value > 1000):
 									self.axisData[i][j] = 1000
 								else:
@@ -119,11 +119,14 @@ class Controller(QtCore.QThread):
 
 		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
 			self.changed = True
-			for i in range(self.controllerNumButtons[-1]):
-				if event.jbutton.button == i:
-					self.buttonData[i] = event.jbutton.state
-				#print("Key pressed")
-				#self.running = False
+			for i in range(len(self.instanceIDs)):
+				if event.jaxis.which == i:
+					
+					for j in range(self.controllerNumButtons[i]):
+						if event.jbutton.button == i:
+							self.buttonData[i][j] = event.jbutton.state
+							#print("Key pressed")
+							#self.running = False
 		# Other Events
 
 	def handle_SettingEvents(self, event):
@@ -211,8 +214,8 @@ class Controller(QtCore.QThread):
 				self.calibrate()
 			else:
 				try:
-					self.DEAD_ZONE = int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE'])
-					self.CONTROLLER_SMOOTH = int(self.config[str(self.controllerNames[-1])]['SMOOTH'])
+					self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
+					self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
 					#self.CONTROLLER_SMOOTH = self.CONTROLLER_SMOOTH + self.DEAD_ZONE
 				except:
 					print("Error getting config values")
@@ -247,7 +250,7 @@ class Controller(QtCore.QThread):
 		self.ctrl_amin = [0] * self.controllerNumAxis[-1]
 
 		while( not sdl2.SDL_JoystickGetButton(self.controllers[-1], 0)):
-			for i in range(self.self.controllerNumAxis[-1]):
+			for i in range(self.controllerNumAxis[-1]):
 				sdl2.SDL_JoystickUpdate()
 				value = sdl2.SDL_JoystickGetAxis(self.controllers[-1], i)
 				if(value > self.ctrl_amax[i]):
@@ -267,6 +270,9 @@ class Controller(QtCore.QThread):
 		# Add default deadzone and filter
 		self.config[str(self.controllerNames[-1])]['DEAD_ZONE'] = '100'
 		self.config[str(self.controllerNames[-1])]['SMOOTH'] = '100'
+
+		self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
+		self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
 
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
