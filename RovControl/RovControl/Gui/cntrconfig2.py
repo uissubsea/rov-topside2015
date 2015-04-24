@@ -76,6 +76,7 @@ class ConfigWindow(QtGui.QWidget):
 
 		self.addControllerBox(self.keyBindingsTab)
 
+		# Add group boxes:
 		self.thrusterGB = QtGui.QGroupBox("Flying directions", self.keyBindingsTab)
 		self.thrusterGB.setGeometry(20, 80, self.GB_w, 92)
 		self.addThrusterGBContents()
@@ -87,6 +88,22 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersGB = QtGui.QGroupBox("ON/OFF functions", self.keyBindingsTab)
 		self.othersGB.setGeometry(20, 380, self.w - 89, 92)
 		self.addOthersGBContents()
+
+		# Add radiobuttons:
+		lbl = QtGui.QLabel('Set controller function:', self.keyBindingsTab)
+		lbl.setGeometry(442, 15, 200, 20)
+		self.thrustRB = QtGui.QRadioButton('Thrusters', self.keyBindingsTab)
+		self.thrustRB.move(442, 37)
+		self.thrustRB.setChecked(True) #Default
+		self.disableManipButtons()# Default
+		self.manipRB = QtGui.QRadioButton('Manipulator', self.keyBindingsTab)
+		self.manipRB.move(442, 60)
+		
+		#if (self.control.controllerList < 0):
+		#	self.enableRBs()
+		#elif (self.control.controllerList > 1):
+		self.thrustRB.toggled.connect(self.disableManipButtons)
+		self.manipRB.toggled.connect(self.disableThrustButtons)
 
 
 	def addControllerTab(self):
@@ -125,7 +142,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.thrustFields = []
 
 		# Add labels:
-		self.thrusterLabels = ['Left/Right(x)', 'Forward/Reverse(y)', 'Up/Down(z)', 'Rotate cw/ccw']
+		self.thrusterLabels = ['Left/Right', 'Forward/Reverse', 'Up/Down', 'Rotate cw/ccw']
 		xpos = [20, 20, 210, 210]
 		ypos = [30, 60, 30, 60]
 
@@ -138,7 +155,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60]
 
 		for i in range(len(xpos)):
-			self.thrustFields.append(QtGui.QLabel('___', self.thrusterGB))
+			self.thrustFields.append(QtGui.QLabel('____', self.thrusterGB))
 			self.thrustFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.thrustFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setThrusterField)
 
@@ -191,7 +208,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [50, 80, 110, 140, 50, 80]
 		
 		for i in range(len(self.manipLabels)): 
-			self.manipFields.append(QtGui.QLabel('___', self.manipulatorGB))
+			self.manipFields.append(QtGui.QLabel('____', self.manipulatorGB))
 			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.manipFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setManipField)
 		
@@ -210,8 +227,8 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersFields = []
 
 		# Add labels:
-		self.othersLabel = ['Lights', 'Cam. 1', 'Cam. 2', 'Cam. 3', 'Hold ground',
-								'Hold surface']
+		self.othersLabel = ['Lights', 'Cam. 1', 'Cam. 2', 'Cam. 3', 'Laser',
+								'Hold ground']
 
 		xpos = [20, 20, 210, 210, 400, 400]
 		ypos = [30, 60, 30, 60, 30, 60]
@@ -225,7 +242,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60, 30, 60]
 		
 		for i in range(len(self.othersLabel)): 
-			self.othersFields.append(QtGui.QLabel('___', self.othersGB))
+			self.othersFields.append(QtGui.QLabel('____', self.othersGB))
 			self.othersFields[i].setGeometry(xpos[i], ypos[i], 50, 20)
 			self.othersFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setOthersField)
 	
@@ -309,6 +326,23 @@ class ConfigWindow(QtGui.QWidget):
 				self.othersFields[i].setText(axis)
 				self.othersButtons[i].setChecked(False)
 
+	def disableThrustButtons(self):
+		for i in range(len(self.thrustButtons)):
+			self.thrustButtons[i].setEnabled(False)
+		for j in range(len(self.manipButtons)):
+			self.manipButtons[j].setEnabled(True)
+
+	def disableManipButtons(self):
+		for i in range(len(self.thrustButtons)):
+			self.thrustButtons[i].setEnabled(True)
+		for j in range(len(self.manipButtons)):
+			self.manipButtons[j].setEnabled(False)
+
+	def enableRBs(self):
+		for i in range(len(self.thrustButtons)):
+			self.thrustButtons[i].setEnabled(True)
+		for j in range(len(self.manipButtons)):
+			self.manipButtons[j].setEnabled(True)
 
 
 		
@@ -341,14 +375,31 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range(len(self.thrusterLabels)):
 			stringOut += str(self.thrustFields[i].text()) + ","
 			
-		self.config[str(self.combo.currentText())]['Map'] = stringOut
-		self.config[str(self.combo.currentText())]['Function'] = thrustOrMan
+		#self.config[str(self.combo.currentText())]['Map'] = stringOut
+		#self.config[str(self.combo.currentText())]['Function'] = thrustOrMan
 
 
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
 
+		self.applyOK = QtGui.QWidget()
+		self.applyOK.resize(300, 110)
+		lbl = QtGui.QLabel('Controller settings have\nsuccessfully been updated!', self.applyOK)
+		lbl.setGeometry(90,17,300,60)
+		okBtn = QtGui.QPushButton('OK', self.applyOK)
+		okBtn.setGeometry(105, 73, 90, 32)
+		icon = QtGui.QLabel(self.applyOK)
+		icon.setScaledContents(True)
+		icon.setGeometry(20,25,50,50)
+		thumb = QtGui.QPixmap('Gui/RESOURCES/thumb.png')
+		icon.setPixmap(thumb)
+		self.applyOK.show()
 
+		okBtn.clicked.connect(self.applyOKHandler)
+
+
+	def applyOKHandler(self):
+		self.applyOK.close()
 
 
 	def resetButtonHandler(self):
