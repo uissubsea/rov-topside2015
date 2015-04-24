@@ -47,9 +47,9 @@ class ManipulatorWidget(QtGui.QWidget):
 		super(ManipulatorWidget, self).__init__()
 
 		# Init. controller:
-		self.ctrl = controller.Controller()
-		self.axis_data = self.ctrl.ctrl_axisdata
-		self.button_data = self.ctrl.ctrl_buttondata
+		#self.ctrl = controller.Controller()
+		#self.axis_data = self.ctrl.ctrl_axisdata
+		#self.button_data = self.ctrl.ctrl_buttondata
 
 		# Init. m values:
 		self.m1 = 0 

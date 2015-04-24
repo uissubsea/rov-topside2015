@@ -46,11 +46,16 @@ class Controller(QtCore.QThread):
 		self.controllerDeadZone = []
 		self.controllerSmooth = []
 
+		# Define Qt Signals
+		self.ControlAdded = QtCore.pyqtSignal(str)
+		self.AxisChanged = QtCore.pyqtSignal(str)
+
 
 	def run(self):
 
 		# Try to open Controllers
-		#self.open_controller(0)
+		for i in range(sdl2.SDL_NumJoysticks()):
+			self.open_controller(i)
 		
 		# Get events
 		if self.inSettings == False:
@@ -65,6 +70,9 @@ class Controller(QtCore.QThread):
 				#print(self.axisData)
 
 				time.sleep(0.05)
+
+			self.closeController()
+
 		else:
 			self.running = True
 			while(self.running):
@@ -77,16 +85,18 @@ class Controller(QtCore.QThread):
 
 				time.sleep(0.05)
 
+			self.closeController()
+
 
 	def handle_events(self, event):
 		# If Controller Event
 
-		if event.type == sdl2.SDL_JOYDEVICEADDED:
-			# Open connected joystick
-			self.open_controller()
-			print("SDL_JOYDEVICEADDED")
+		#if event.type == sdl2.SDL_JOYDEVICEADDED:
+		#	# Open connected joystick
+		#	self.open_controller()
+		#	print("SDL_JOYDEVICEADDED")
 
-		elif event.type == sdl2.SDL_JOYAXISMOTION:
+		if event.type == sdl2.SDL_JOYAXISMOTION:
 			self.changed = True
 			for i in range(len(self.instanceIDs)):
 				if event.jaxis.which == i:
@@ -94,6 +104,8 @@ class Controller(QtCore.QThread):
 				
 						if event.jaxis.axis == j:
 							value = int(event.jaxis.value/self.controllerSmooth[i])
+							if j == 1:
+								value = value *-1							
 							# Left- right movement (x)
 							#if event.jaxis.axis == 2:
 							#	value = value + 670
@@ -123,48 +135,48 @@ class Controller(QtCore.QThread):
 				if event.jaxis.which == i:
 					
 					for j in range(self.controllerNumButtons[i]):
-						if event.jbutton.button == i:
+						if event.jbutton.button == j:
 							self.buttonData[i][j] = event.jbutton.state
 							#print("Key pressed")
 							#self.running = False
 		# Other Events
 
 	def handle_SettingEvents(self, event):
+		
 		# If Controller Event
 
-		if event.type == sdl2.SDL_JOYDEVICEADDED:
-			# Open connected joystick
-			self.open_controller()
-			print("SDL_JOYDEVICEADDED")
+		#if event.type == sdl2.SDL_JOYDEVICEADDED:
+		#	# Open connected joystick
+		#	self.open_controller()
+		#	print("SDL_JOYDEVICEADDED")
 
-		elif event.type == sdl2.SDL_JOYAXISMOTION:
+		if event.type == sdl2.SDL_JOYAXISMOTION:
 			self.changed = True
 			for i in range(len(self.instanceIDs)):
 				if event.jaxis.which == i:
 					for j in range(self.controllerNumAxis[i]): 
 				
 						if event.jaxis.axis == j:
-							value = int(event.jaxis.value/self.CONTROLLER_SMOOTH)
+							value = int(event.jaxis.value/self.controllerSmooth[i])
 							# Left- right movement (x)
-							if event.jaxis.axis == 3:
-								value = value + 670
+							#if event.jaxis.axis == 2:
+							#	value = value + 670
 							
-							if (value > -self.DEAD_ZONE and value < self.DEAD_ZONE):
+							if (value > -self.controllerDeadZone[i] and value < self.controllerDeadZone[i]):
 								#Inside Dead zone
 								self.axisData[i][j] = 0
 
-
-							elif (value < -self.DEAD_ZONE):
-								value = value + self.DEAD_ZONE
-								self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(i))
+							elif (value < -self.controllerDeadZone[i]):
+								value = value + self.controllerDeadZone[i]
+								self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(j))
 								if (value < -1000):
 									self.axisData[i][j] = -1000
 								else:
 									self.axisData[i][j] = value
 					
-							elif (value > self.DEAD_ZONE):
-								value = value - self.DEAD_ZONE
-								self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(i))
+							elif (value > self.controllerDeadZone[i]):
+								value = value - self.controllerDeadZone[i]
+								self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(j))
 								if (value > 1000):
 									self.axisData[i][j] = 1000
 								else:
@@ -173,11 +185,15 @@ class Controller(QtCore.QThread):
 
 		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
 			self.changed = True
-			for i in range(self.controllerNumButtons[-1]):
-				if event.jbutton.button == i:
-					self.buttonData[i] = event.jbutton.state
-				#print("Key pressed")
-				#self.running = False
+			for i in range(len(self.instanceIDs)):
+				if event.jaxis.which == i:
+					
+					for j in range(self.controllerNumButtons[i]):
+						if event.jbutton.button == j:
+							self.buttonData[i][j] = event.jbutton.state
+							self.emit(QtCore.SIGNAL('setText(QString)'), "Btn" + str(j))
+							#print("Key pressed")
+							#self.running = False
 		# Other Events
 
 
@@ -195,7 +211,7 @@ class Controller(QtCore.QThread):
 			else:
 				self.controllers.append(sdl2.SDL_JoystickOpen(index))
 				# Get instanceID
-				self.instanceID.append(sdl2.SDL_JoystickInstanceID(self.controllers[-1]))
+				self.instanceIDs.append(sdl2.SDL_JoystickInstanceID(self.controllers[-1]))
 
 			# Log name of last connected joystick. -1 list index is last element
 			self.controllerNames.append(sdl2.SDL_JoystickName(self.controllers[-1]))
@@ -243,7 +259,14 @@ class Controller(QtCore.QThread):
 		# While loop to determine max min values
 		print("No controller config for this model was found")
 		print("Calibration is required\n")
-		print("Move all joystick axes and press main button when done")
+		print("Move all joystick axes and press main button when done")		
+
+		# Add default deadzone and filter
+		self.config[str(self.controllerNames[-1])]['DEAD_ZONE'] = '100'
+		self.config[str(self.controllerNames[-1])]['SMOOTH'] = '29'
+
+		self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
+		self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
 
 		# create arrays to hold Max/Min Values
 		self.ctrl_amax = [0] * self.controllerNumAxis[-1]
@@ -253,11 +276,12 @@ class Controller(QtCore.QThread):
 			for i in range(self.controllerNumAxis[-1]):
 				sdl2.SDL_JoystickUpdate()
 				value = sdl2.SDL_JoystickGetAxis(self.controllers[-1], i)
+				value = value / self.controllerSmooth[-1]
+				
 				if(value > self.ctrl_amax[i]):
 					self.ctrl_amax[i] = value;
 				if(value < self.ctrl_amin[i]):
 					self.ctrl_amin[i] = value
-				
 
 		# Max values should now be in ctrl_axisdata list.
 		# Write values to config.
@@ -267,20 +291,16 @@ class Controller(QtCore.QThread):
 			self.config[str(self.controllerNames[-1])]['Axis' + str(i) + "Min"] = str(self.ctrl_amin[i])
 
 
-		# Add default deadzone and filter
-		self.config[str(self.controllerNames[-1])]['DEAD_ZONE'] = '100'
-		self.config[str(self.controllerNames[-1])]['SMOOTH'] = '100'
-
-		self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
-		self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
-
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
 
 		print("Done calibrating")
 
 	def closeController(self):
-		# Close controller and stop thread
+		# Close controller
+
+		self.running = False
+
 		for i in range(len(self.controllers)):
 			sdl2.SDL_JoystickClose(self.controllers[i])
 			print("Closed controller %s" %(self.controllers[i]))

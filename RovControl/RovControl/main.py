@@ -156,7 +156,7 @@ class MainWidget(QtGui.QMainWindow):
             self.logFile.open(QtCore.QIODevice.ReadOnly)
             self.stream = QtCore.QTextStream(self.logFile)
             self.ui.textEdit.setText(self.stream.readAll())
-        except e:
+        except AttributeError as e:
             print(e)
 
 
@@ -240,7 +240,10 @@ class MainWidget(QtGui.QMainWindow):
     def connect(self):
         #Start Network Client
         self.netClient.start()
+
+        self.netClient.running = True
         #self.open_statusWindow()
+        self.netClient.connect()
 
     def disconnect(self):
         # Stop Network client

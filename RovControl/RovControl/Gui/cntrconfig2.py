@@ -10,13 +10,13 @@ class ConfigWindow(QtGui.QWidget):
 
 	def __init__(self):
 		super(ConfigWindow, self).__init__()
-		self.ctrl = controller.Controller()
-		self.ctrl.inSettings = True
+		self.control = controller.Controller()
+		self.control.inSettings = True
 
 		self.config = configparser.ConfigParser()
-		self.config.read('../Config/controller.cfg')
+		self.config.read('Config/controller.cfg')
 
-		self.ctrl.start()
+		self.control.start()
 
 		self.initUI()
 
@@ -125,7 +125,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.thrustFields = []
 
 		# Add labels:
-		self.thrusterLabels = ['Up/Down', 'Left/Right', 'Forward/Reverse', 'Rotate cw/ccw']
+		self.thrusterLabels = ['Left/Right(x)', 'Forward/Reverse(y)', 'Up/Down(z)', 'Rotate cw/ccw']
 		xpos = [20, 20, 210, 210]
 		ypos = [30, 60, 30, 60]
 
@@ -140,7 +140,7 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range(len(xpos)):
 			self.thrustFields.append(QtGui.QLabel('___', self.thrusterGB))
 			self.thrustFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
-			self.thrustFields[i].connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.setField)
+			self.thrustFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setThrusterField)
 
 		
 		# Add illustration:
@@ -158,10 +158,12 @@ class ConfigWindow(QtGui.QWidget):
 		self.comboLabel.setGeometry(22, 25, 200, 30)
 		self.combo = QtGui.QComboBox(tab)
 		self.combo.setGeometry(223, 27, 200, 30)
-		controllerList = self.ctrl.connected_controllers()
+		
+		# wait two seconds for controllers to initialize
+		time.sleep(0.2)
+		controllerList = self.control.connected_controllers()
 		for i in range (len(controllerList)):
 			self.combo.addItem(controllerList[i])
-
 
 
 	def addManipulatorGBContents(self):
@@ -191,7 +193,7 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range(len(self.manipLabels)): 
 			self.manipFields.append(QtGui.QLabel('___', self.manipulatorGB))
 			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
-			self.manipFields[i].connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.setField)
+			self.manipFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setManipField)
 		
 		
 		# Add illustration:
@@ -225,7 +227,7 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range(len(self.othersLabel)): 
 			self.othersFields.append(QtGui.QLabel('___', self.othersGB))
 			self.othersFields[i].setGeometry(xpos[i], ypos[i], 50, 20)
-			self.othersFields[i].connect(self.ctrl, QtCore.SIGNAL('setText(QString)'), self.setField)
+			self.othersFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setOthersField)
 	
 
 	def addGeneralGBContents(self):
@@ -288,17 +290,26 @@ class ConfigWindow(QtGui.QWidget):
 		self.move(qr.topLeft())
 
 
-	def setField(self, axis):
+	def setThrusterField(self, axis):
 		# Loop through array to check which field should be set
-		for i in range(8):
+		for i in range(len(self.thrusterLabels)):
 			if self.thrustButtons[i].isChecked():
 				self.thrustFields[i].setText(axis)
 				self.thrustButtons[i].setChecked(False)
 
-		for i in range(10):
+	def setManipField(self, axis):
+		for i in range(len(self.manipLabels)):
 			if self.manipButtons[i].isChecked():
 				self.manipFields[i].setText(axis)
 				self.manipButtons[i].setChecked(False)
+
+	def setOthersField(self, axis):
+		for i in range(len(self.othersLabel)):
+			if self.othersButtons[i].isChecked():
+				self.othersFields[i].setText(axis)
+				self.othersButtons[i].setChecked(False)
+
+
 
 		
 ################################################################################
@@ -318,19 +329,24 @@ class ConfigWindow(QtGui.QWidget):
 	
 
 	def cancelButtonHandler(self):
-		self.ctrl.closeController()
+		self.control.running = False
 		self.close()
 
 
 	def applyButtonHandler(self):
-		print("Settings Written to config")
-		
-		for i in range(4):
-			self.config[str(self.ctrl.ctrl_name)][self.thrusterLabels[i]] = self.thrustFields[i]
+		# This function saves settings to configfile
+		# Save to section with current name in comboBox
+		stringOut = ""
+		thrustOrMan = ""
+		for i in range(len(self.thrusterLabels)):
+			stringOut += str(self.thrustFields[i].text()) + ","
+			
+		self.config[str(self.combo.currentText())]['Map'] = stringOut
+		self.config[str(self.combo.currentText())]['Function'] = thrustOrMan
 
-		with open('../Config/controller.cfg', 'w') as configfile:
+
+		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
-		
 
 
 
