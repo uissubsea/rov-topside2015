@@ -57,7 +57,7 @@ class NetworkClient(QtCore.QThread):
 		self.running = True
 
 		self.thData = [0] * 4
-		self.manipData = [0] * 5
+		self.manipData = [0] * 6
 
 
 	def run(self):

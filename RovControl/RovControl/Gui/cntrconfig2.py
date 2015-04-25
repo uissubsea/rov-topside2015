@@ -100,7 +100,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.manipRB = QtGui.QRadioButton('Manipulator', self.keyBindingsTab)
 		self.manipRB.move(442, 60)
 		
-		num = 1 # hent len(listOfControllers)
+		num = len(self.controllerList) # hent len(listOfControllers)
 		if (num < 1):
 			self.activateManipButtons(False)
 			self.activateThrustButtons(False)
@@ -193,9 +193,9 @@ class ConfigWindow(QtGui.QWidget):
 		
 		# wait two seconds for controllers to initialize
 		time.sleep(0.2)
-		controllerList = self.control.connected_controllers()
-		for i in range (len(controllerList)):
-			self.combo.addItem(controllerList[i])
+		self.controllerList = self.control.connected_controllers()
+		for i in range (len(self.controllerList)):
+			self.combo.addItem(self.controllerList[i])
 
 
 	def addManipulatorGBContents(self):
@@ -456,7 +456,12 @@ class ConfigWindow(QtGui.QWidget):
 			stringOut += str(self.thrustFields[i].text()) + ","
 			
 		#self.config[str(self.combo.currentText())]['Map'] = stringOut
-		#self.config[str(self.combo.currentText())]['Function'] = thrustOrMan
+		if self.thrustRB.isChecked():
+			self.config[str(self.combo.currentText())]['Function'] = "Thruster"
+		elif self.manipRB.isChecked():
+			self.config[str(self.combo.currentText())]['Function'] = "Manip"
+		else:
+			self.config[str(self.combo.currentText())]['Function'] = "Thruster"
 
 
 		with open('Config/controller.cfg', 'w') as configfile:
