@@ -22,8 +22,11 @@ class ConfigWindow(QtGui.QWidget):
 
 
 	def initUI(self):
-		self.EXP_S_DEFAULT = 20
-		self.LIN_S_DEFAULT = 10
+		self.th_LIN_DEFAULT = 10
+		self.th_EXP_DEFAULT = 20
+		self.ma_LIN_DEFAULT = 10
+		self.ma_EXP_DEFAULT = 20
+		self.DEADZONE_DEFAULT = 100
 
 		self.w = 680
 		self.h = 600
@@ -76,6 +79,7 @@ class ConfigWindow(QtGui.QWidget):
 
 		self.addControllerBox(self.keyBindingsTab)
 
+		# Add group boxes:
 		self.thrusterGB = QtGui.QGroupBox("Flying directions", self.keyBindingsTab)
 		self.thrusterGB.setGeometry(20, 80, self.GB_w, 92)
 		self.addThrusterGBContents()
@@ -88,15 +92,43 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersGB.setGeometry(20, 380, self.w - 89, 92)
 		self.addOthersGBContents()
 
+		# Add radiobuttons:
+		lbl = QtGui.QLabel('Set controller function:', self.keyBindingsTab)
+		lbl.setGeometry(442, 15, 200, 20)
+		self.thrustRB = QtGui.QRadioButton('Thrusters', self.keyBindingsTab)
+		self.thrustRB.move(442, 37)
+		self.manipRB = QtGui.QRadioButton('Manipulator', self.keyBindingsTab)
+		self.manipRB.move(442, 60)
+		
+		num = 1 # hent len(listOfControllers)
+		if (num < 1):
+			self.activateManipButtons(False)
+			self.activateThrustButtons(False)
+			self.activateOtherButtons(False)
+			self.thrustRB.setEnabled(False)
+			self.manipRB.setEnabled(False)
+		elif (num == 1):	
+			self.activateManipButtons(True)
+			self.activateThrustButtons(True)
+			self.activateOtherButtons(True)
+			self.thrustRB.setEnabled(False)
+			self.manipRB.setEnabled(False)
+		elif (num > 1):
+			self.thrustRB.setEnabled(True)
+			self.manipRB.setEnabled(True)
+			self.thrustRB.setChecked(True)
+			self.activateThrustButtons(True)
+			self.activateManipButtons(False)
+			self.thrustRB.toggled.connect(self.thrustToggled)
+			self.manipRB.toggled.connect(self.manipToggled)
+			
+
 
 	def addControllerTab(self):
 		self.controllerTab = QtGui.QWidget()
 		self.tabwindow.addTab(self.controllerTab, "Controller")
 
 		self.addControllerBox(self.controllerTab)
-
-		self.compCheckBox = QtGui.QCheckBox('  Compensation', self.controllerTab)
-		self.compCheckBox.move(20, 70)
 
 
 	def addSensTab(self):
@@ -106,15 +138,15 @@ class ConfigWindow(QtGui.QWidget):
 		self.addControllerBox(self.sensitivityTab)
 
 		self.generalGB = QtGui.QGroupBox("General", self.sensitivityTab)
-		self.generalGB.setGeometry(20, 80, self.GB_w, 80)
+		self.generalGB.setGeometry(20, 80, self.GB_w, 60)
 		self.addGeneralGBContents()
 
-		self.thSensGB = QtGui.QGroupBox("Throttle ", self.sensitivityTab)
-		self.thSensGB.setGeometry(20, 248, self.w - 89, 150)
+		self.thSensGB = QtGui.QGroupBox("Throttle", self.sensitivityTab)
+		self.thSensGB.setGeometry(20, 150, self.w - 89, 150)
 		self.addThSensGBContents()
 
 		self.maSpeedGB = QtGui.QGroupBox("Manipulator", self.sensitivityTab)
-		self.maSpeedGB.setGeometry(20, 300, self.w - 89, 100)
+		self.maSpeedGB.setGeometry(20, 310, self.w - 89, 150)
 		self.addMaSpeedGBContents()
 
 	# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
@@ -125,7 +157,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.thrustFields = []
 
 		# Add labels:
-		self.thrusterLabels = ['Left/Right(x)', 'Forward/Reverse(y)', 'Up/Down(z)', 'Rotate cw/ccw']
+		self.thrusterLabels = ['Left/Right', 'Forward/Reverse', 'Up/Down', 'Rotate cw/ccw']
 		xpos = [20, 20, 210, 210]
 		ypos = [30, 60, 30, 60]
 
@@ -138,7 +170,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60]
 
 		for i in range(len(xpos)):
-			self.thrustFields.append(QtGui.QLabel('___', self.thrusterGB))
+			self.thrustFields.append(QtGui.QLabel('____', self.thrusterGB))
 			self.thrustFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.thrustFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setThrusterField)
 
@@ -191,7 +223,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [50, 80, 110, 140, 50, 80]
 		
 		for i in range(len(self.manipLabels)): 
-			self.manipFields.append(QtGui.QLabel('___', self.manipulatorGB))
+			self.manipFields.append(QtGui.QLabel('____', self.manipulatorGB))
 			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.manipFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setManipField)
 		
@@ -210,8 +242,8 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersFields = []
 
 		# Add labels:
-		self.othersLabel = ['Lights', 'Cam. 1', 'Cam. 2', 'Cam. 3', 'Hold ground',
-								'Hold surface']
+		self.othersLabel = ['Lights', 'Cam. 1', 'Cam. 2', 'Cam. 3', 'Laser',
+								'Hold ground']
 
 		xpos = [20, 20, 210, 210, 400, 400]
 		ypos = [30, 60, 30, 60, 30, 60]
@@ -225,59 +257,108 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60, 30, 60]
 		
 		for i in range(len(self.othersLabel)): 
-			self.othersFields.append(QtGui.QLabel('___', self.othersGB))
+			self.othersFields.append(QtGui.QLabel('____', self.othersGB))
 			self.othersFields[i].setGeometry(xpos[i], ypos[i], 50, 20)
 			self.othersFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setOthersField)
 	
 
 	def addGeneralGBContents(self):
-		label = QtGui.QLabel('Dead zone:', self.generalGB)
-		label.setGeometry(20, 30, 50, 20)
+		label = QtGui.QLabel('Dead zone', self.generalGB)
+		label.setGeometry(50, 30, 100, 20)		
+
+		self.dzSlider = QtGui.QSlider(self.generalGB)
+		self.dzSlider.setGeometry(150, 30, 160, 22)
+		self.dzSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.dzSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.dzSlider.setTickInterval(20)
+		self.dzSlider.setMinimum(0)
+		self.dzSlider.setMaximum(500)
+		self.dzSlider.setValue(self.DEADZONE_DEFAULT)
+
+		self.dzSliderValue = QtGui.QLabel(str(self.dzSlider.value()), self.generalGB)
+		self.dzSliderValue.setGeometry(340, 30, 50, 20)
+
+		self.dzSlider.actionTriggered.connect(self.updateSliders)
 
 
 	def addThSensGBContents(self):
-		self.linButton = QtGui.QRadioButton(self.thSensGB)
-		self.linButton.setGeometry(20, 50, 20, 20)
-		self.linButton.setChecked(True) #Default
+		self.thLinButton = QtGui.QRadioButton(self.thSensGB)
+		self.thLinButton.setGeometry(20, 50, 20, 20)
+		self.thLinButton.setChecked(True) #Default
 		
-		self.linLabel = QtGui.QLabel("Linear", self.thSensGB)
-		self.linLabel.setGeometry(50, 50, 50, 20)
-		self.linSliderValue = QtGui.QLabel(str(self.LIN_S_DEFAULT), self.thSensGB)
-		self.linSliderValue.setGeometry(340, 50, 50, 20)
+		self.thLinLabel = QtGui.QLabel("Linear", self.thSensGB)
+		self.thLinLabel.setGeometry(50, 50, 50, 20)
+		self.thLinSliderValue = QtGui.QLabel(str(self.th_LIN_DEFAULT), self.thSensGB)
+		self.thLinSliderValue.setGeometry(340, 50, 50, 20)
 
-		self.linSlider = QtGui.QSlider(self.thSensGB)
-		self.linSlider.setGeometry(150, 50, 160, 22)
-		self.linSlider.setOrientation(QtCore.Qt.Horizontal)
-		self.linSlider.setTickPosition(QtGui.QSlider.NoTicks)
-		self.linSlider.setTickInterval(0)
-		self.linSlider.setValue(self.LIN_S_DEFAULT)
+		self.thLinSlider = QtGui.QSlider(self.thSensGB)
+		self.thLinSlider.setGeometry(150, 50, 160, 22)
+		self.thLinSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.thLinSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.thLinSlider.setTickInterval(0)
+		self.thLinSlider.setValue(self.th_LIN_DEFAULT)
 
-		self.expButton = QtGui.QRadioButton(self.thSensGB)
-		self.expButton.setGeometry(20, 80, 102, 20)
+		self.thExpButton = QtGui.QRadioButton(self.thSensGB)
+		self.thExpButton.setGeometry(20, 80, 102, 20)
 		
-		self.expLabel =QtGui.QLabel("Exponential", self.thSensGB)
-		self.expLabel.setGeometry(50, 80, 90, 20)
-		self.expSliderValue = QtGui.QLabel(str(self.EXP_S_DEFAULT), self.thSensGB)
-		self.expSliderValue.setGeometry(340, 80, 50, 20)
+		self.thExpLabel = QtGui.QLabel("Exponential", self.thSensGB)
+		self.thExpLabel.setGeometry(50, 80, 90, 20)
+		self.thExpSliderValue = QtGui.QLabel(str(self.th_EXP_DEFAULT), self.thSensGB)
+		self.thExpSliderValue.setGeometry(340, 80, 50, 20)
 
-		self.expSlider = QtGui.QSlider(self.thSensGB)
-		self.expSlider.setGeometry(150, 80, 160, 22)
-		self.expSlider.setOrientation(QtCore.Qt.Horizontal)
-		self.expSlider.setTickPosition(QtGui.QSlider.NoTicks)
-		self.expSlider.setTickInterval(0)
-		self.expSlider.setEnabled(False) #Defalut
-		self.expSlider.setValue(self.EXP_S_DEFAULT)
+		self.thExpSlider = QtGui.QSlider(self.thSensGB)
+		self.thExpSlider.setGeometry(150, 80, 160, 22)
+		self.thExpSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.thExpSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.thExpSlider.setTickInterval(0)
+		self.thExpSlider.setEnabled(False) #Defalut
+		self.thExpSlider.setValue(self.th_EXP_DEFAULT)
 		
 		# Action handlers:
-		self.linButton.clicked.connect(self.linButtonHandler)
-		self.expButton.clicked.connect(self.expButtonHandler)
-		self.linSlider.actionTriggered.connect(self.updateSliders)
-		self.expSlider.actionTriggered.connect(self.updateSliders)
-		#print(self.linSlider.value())
-		
+		self.thLinButton.clicked.connect(self.thLinButtonHandler)
+		self.thExpButton.clicked.connect(self.thExpButtonHandler)
+		self.thLinSlider.actionTriggered.connect(self.updateSliders)
+		self.thExpSlider.actionTriggered.connect(self.updateSliders)
+
 
 	def addMaSpeedGBContents(self):
-		print('jwe')
+		self.maLinButton = QtGui.QRadioButton(self.maSpeedGB)
+		self.maLinButton.setGeometry(20, 50, 20, 20)
+		self.maLinButton.setChecked(True) #Default
+		
+		self.maLinLabel = QtGui.QLabel("Linear", self.maSpeedGB)
+		self.maLinLabel.setGeometry(50, 50, 50, 20)
+		self.maLinSliderValue = QtGui.QLabel(str(self.ma_LIN_DEFAULT), self.maSpeedGB)
+		self.maLinSliderValue.setGeometry(340, 50, 50, 20)
+
+		self.maLinSlider = QtGui.QSlider(self.maSpeedGB)
+		self.maLinSlider.setGeometry(150, 50, 160, 22)
+		self.maLinSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.maLinSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.maLinSlider.setTickInterval(0)
+		self.maLinSlider.setValue(self.ma_LIN_DEFAULT)
+
+		self.maExpButton = QtGui.QRadioButton(self.maSpeedGB)
+		self.maExpButton.setGeometry(20, 80, 102, 20)
+		
+		self.maExpLabel = QtGui.QLabel("Exponential", self.maSpeedGB)
+		self.maExpLabel.setGeometry(50, 80, 90, 20)
+		self.maExpSliderValue = QtGui.QLabel(str(self.ma_EXP_DEFAULT), self.maSpeedGB)
+		self.maExpSliderValue.setGeometry(340, 80, 50, 20)
+
+		self.maExpSlider = QtGui.QSlider(self.maSpeedGB)
+		self.maExpSlider.setGeometry(150, 80, 160, 22)
+		self.maExpSlider.setOrientation(QtCore.Qt.Horizontal)
+		self.maExpSlider.setTickPosition(QtGui.QSlider.NoTicks)
+		self.maExpSlider.setTickInterval(0)
+		self.maExpSlider.setEnabled(False) #Defalut
+		self.maExpSlider.setValue(self.ma_EXP_DEFAULT)
+		
+		# Action handlers:
+		self.maLinButton.clicked.connect(self.maLinButtonHandler)
+		self.maExpButton.clicked.connect(self.maExpButtonHandler)
+		self.maLinSlider.actionTriggered.connect(self.updateSliders)
+		self.maExpSlider.actionTriggered.connect(self.updateSliders)
 
 	
 	# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -309,6 +390,28 @@ class ConfigWindow(QtGui.QWidget):
 				self.othersFields[i].setText(axis)
 				self.othersButtons[i].setChecked(False)
 
+	def activateThrustButtons(self, bool):
+		for i in range(len(self.thrustButtons)):
+			self.thrustButtons[i].setEnabled(bool)
+
+	def activateManipButtons(self, bool):
+		for i in range(len(self.manipButtons)):
+			self.manipButtons[i].setEnabled(bool)
+
+	def activateOtherButtons(self, bool):
+		for i in range(len(self.othersButtons)):
+			self.othersButtons[i].setEnabled(bool)
+
+	def thrustToggled(self):
+		self.activateThrustButtons(True)
+		self.activateManipButtons(False)
+		self.activateOtherButtons(True)
+
+	def manipToggled(self):
+		self.activateThrustButtons(False)
+		self.activateManipButtons(True)
+		self.activateOtherButtons(True)
+
 
 
 		
@@ -316,15 +419,26 @@ class ConfigWindow(QtGui.QWidget):
 #   BUTTON HANDLERS --- class ConfigWindow()
 ################################################################################
 
-	def linButtonHandler(self):
-		self.linSlider.setEnabled(True)
-		self.expSlider.setEnabled(False)
+	def thLinButtonHandler(self):
+		self.thLinSlider.setEnabled(True)
+		self.thExpSlider.setEnabled(False)
 		self.updateSliders()
 
 
-	def expButtonHandler(self):
-		self.linSlider.setEnabled(False)
-		self.expSlider.setEnabled(True)
+	def thExpButtonHandler(self):
+		self.thLinSlider.setEnabled(False)
+		self.thExpSlider.setEnabled(True)
+		self.updateSliders()
+
+	def maLinButtonHandler(self):
+		self.maLinSlider.setEnabled(True)
+		self.maExpSlider.setEnabled(False)
+		self.updateSliders()
+
+
+	def maExpButtonHandler(self):
+		self.maLinSlider.setEnabled(False)
+		self.maExpSlider.setEnabled(True)
 		self.updateSliders()
 	
 
@@ -341,14 +455,31 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range(len(self.thrusterLabels)):
 			stringOut += str(self.thrustFields[i].text()) + ","
 			
-		self.config[str(self.combo.currentText())]['Map'] = stringOut
-		self.config[str(self.combo.currentText())]['Function'] = thrustOrMan
+		#self.config[str(self.combo.currentText())]['Map'] = stringOut
+		#self.config[str(self.combo.currentText())]['Function'] = thrustOrMan
 
 
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
 
+		self.applyOK = QtGui.QWidget()
+		self.applyOK.resize(300, 110)
+		lbl = QtGui.QLabel('Controller settings have\nsuccessfully been updated!', self.applyOK)
+		lbl.setGeometry(90,17,300,60)
+		okBtn = QtGui.QPushButton('OK', self.applyOK)
+		okBtn.setGeometry(105, 73, 90, 32)
+		icon = QtGui.QLabel(self.applyOK)
+		icon.setScaledContents(True)
+		icon.setGeometry(20,25,50,50)
+		thumb = QtGui.QPixmap('Gui/RESOURCES/thumb.png')
+		icon.setPixmap(thumb)
+		self.applyOK.show()
 
+		okBtn.clicked.connect(self.applyOKHandler)
+
+
+	def applyOKHandler(self):
+		self.applyOK.close()
 
 
 	def resetButtonHandler(self):
@@ -378,20 +509,27 @@ class ConfigWindow(QtGui.QWidget):
 		noBtn.clicked.connect(self.resetNoHandler)
 
 	def resetYesHandler(self):
-		self.linSlider.setValue(self.LIN_S_DEFAULT)
-		self.expSlider.setValue(self.EXP_S_DEFAULT)
+		self.thLinSlider.setValue(self.th_LIN_DEFAULT)
+		self.thExpSlider.setValue(self.th_EXP_DEFAULT)
+		self.maLinSlider.setValue(self.ma_LIN_DEFAULT)
+		self.maExpSlider.setValue(self.ma_EXP_DEFAULT)
+		self.dzSlider.setValue(self.DEADZONE_DEFAULT)
 		self.updateSliders()
-		#slett configfilene
-		#
+		
+		#erase config
+		open("Config/controller.cfg","w").close()
+
 		self.sw.close()
 
 	def resetNoHandler(self):
 		self.sw.close()
 
-
 	def updateSliders(self):
-		self.linSliderValue.setText(str(self.linSlider.value()))
-		self.expSliderValue.setText(str(self.expSlider.value()))
+		self.thLinSliderValue.setText(str(self.thLinSlider.value()))
+		self.thExpSliderValue.setText(str(self.thExpSlider.value()))
+		self.maLinSliderValue.setText(str(self.maLinSlider.value()))
+		self.maExpSliderValue.setText(str(self.maExpSlider.value()))
+		self.dzSliderValue.setText(str(self.dzSlider.value()))
 		
 ################################################################################
 #   MAIN
