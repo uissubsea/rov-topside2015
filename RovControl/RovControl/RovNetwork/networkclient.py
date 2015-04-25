@@ -51,6 +51,9 @@ class NetworkClient(QtCore.QThread):
 		self.thrusterMap = []
 		self.manipMap = []
 
+		self.useManip = False
+		self.useThrust = False
+
 		self.running = True
 
 		self.thData = [0] * 4
@@ -81,24 +84,30 @@ class NetworkClient(QtCore.QThread):
 				self.axis_data = self.control.axisData
 				self.button_data = self.control.axisData
 
-				print(self.axis_data)
-				print(self.manipData)
+				#for i in range(4):
+				#	self.thData[i] = self.axis_data[0][self.thrusterMap[i]]
 
-				for i in range(4):
-					self.thData[i] = self.axis_data[0][self.thrusterMap[i]]
+				for i in range(len(self.axis_data)):
+					if(self.controlFunction[i] == "Thruster"):
+						self.useThrust = True
+						for j in range(len(self.thrusterMap)):
+							self.thData[j] = self.axis_data[i][self.thrusterMap[j]]
+					
+					elif(self.controlFunction[i] == "Manip"):
+						self.useManip = True
+						for j in range(len(self.manipMap)):
+							self.manipData[j] = self.axis_data[i][self.manipMap[j]]
 
-				for i in range(4):
-					self.manipData[i] = self.axis_data[1][self.manipMap[i]]
-
-				#print(self.axis_data)
 				# Only send data if controller status changed
 				if (self.control.changed):
 
-					##self.axis_data[0][2] = self.axis_data[0][2] + 670
+					self.str = self.serialize(self.thData, self.manipData)
 
-					#self.str = self.serialize(self.axis_data)
+					#print(self.thData)
+					#print(self.manipData)
+					#print(self.axis_data)
 
-					print(self.thData)
+					print(self.str)
 
 					#self.sock.sendall(bytes(self.str, 'UTF-8'))
 
@@ -113,14 +122,17 @@ class NetworkClient(QtCore.QThread):
 				time.sleep(0.05)
 			time.sleep(5)
 
-	def serialize(self, rov_data):
+	def serialize(self, thData, manipData):
 		# Create ASCII string to contain data
 		string = ""
 		# Loop through first 4 data. Assume they are thruster values
-		for i in range(len(rov_data)):
-			for j in range(len(rov_data[i])):
-				string += str(rov_data[i][j]) + ","
-			#string += ";"
+		if self.useThrust:
+			for item in self.thData:
+				string += str(item) + ","
+		
+		if self.useManip:
+			for item in self.manipData:
+				string += str(item) + ","
 
 		return string
 
@@ -143,6 +155,7 @@ class NetworkClient(QtCore.QThread):
 
 
 	def configController(self):
+		# Multi dimensional List to hold maps for all controllers
 		for i in range(len(self.control.controllerNames)):
 			self.controllerMap.append([0] * (self.control.controllerNumAxis[i] + 1))
 
@@ -152,15 +165,17 @@ class NetworkClient(QtCore.QThread):
 			self.controlFunction.append(self.config[str(controller)]["Function"])
 			self.controllerMap[idx] = re.findall(r'\d+', self.stringMap[idx])
 
+		print(self.controlFunction)
 		# Make ints of list
 		for i in range(len(self.controllerMap)):
 			for j in range(len(self.controllerMap[i])):
 				self.controllerMap[i][j] = int(self.controllerMap[i][j])
 
-		self.thrusterMap = self.controllerMap[0]
-		self.manipMap = self.controllerMap[1]
-		print(self.thrusterMap)
-		print(self.manipMap)
+		for i in range(len(self.controllerMap)):
+			if(self.controlFunction[i] == "Thruster"):
+				self.thrusterMap = self.controllerMap[i]
+			elif(self.controlFunction[i] == "Manip"):
+				self.manipMap = self.controllerMap[i]
 		
 
 class Receiver(QtCore.QThread):
