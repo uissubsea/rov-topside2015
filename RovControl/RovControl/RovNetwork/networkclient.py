@@ -50,6 +50,7 @@ class NetworkClient(QtCore.QThread):
 
 		self.thrusterMap = []
 		self.manipMap = []
+		self.inverseMap = []
 
 		self.useManip = False
 		self.useThrust = False
@@ -91,12 +92,21 @@ class NetworkClient(QtCore.QThread):
 					if(self.controlFunction[i] == "Thruster"):
 						self.useThrust = True
 						for j in range(len(self.thrusterMap)):
-							self.thData[j] = self.axis_data[i][self.thrusterMap[j]]
+							value = self.axis_data[i][self.thrusterMap[j]]
+							#if j == 0 or j == 2:
+							#	self.thData[j] = value * -1
+							#else:
+							self.thData[j] = value
+							
 					
 					elif(self.controlFunction[i] == "Manip"):
 						self.useManip = True
 						for j in range(len(self.manipMap)):
-							self.manipData[j] = self.axis_data[i][self.manipMap[j]]
+							value = self.axis_data[i][self.manipMap[j]]
+							if j == 4 or j == 5:
+								self.manipData[j] = value + 107
+							else:
+								self.manipData[j] = value
 
 				# Only send data if controller status changed
 				if (self.control.changed):
@@ -107,18 +117,18 @@ class NetworkClient(QtCore.QThread):
 					#print(self.manipData)
 					#print(self.axis_data)
 
-					print(self.str)
+					#print(self.str)
 
-					#self.sock.sendall(bytes(self.str, 'UTF-8'))
+					self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 					# Receive Data from ROV and log
 
-				
+					self.data = self.sock.recv(128)
 					#self.parse_data(self.data.decode("UTF-8"))
 
-					#print(self.data, "\r", end="")
+					print(self.data, "\r", end="")
 
-				#self.data = self.sock.recv(128)
+				
 				time.sleep(0.05)
 			time.sleep(5)
 
@@ -129,10 +139,14 @@ class NetworkClient(QtCore.QThread):
 		if self.useThrust:
 			for item in self.thData:
 				string += str(item) + ","
-		
+		elif not self.useThrust:
+			string += "0,0,0,0,"
 		if self.useManip:
 			for item in self.manipData:
 				string += str(item) + ","
+		elif not self.useManip:
+			string += "0,0,0,0,0,0,"
+
 
 		return string
 

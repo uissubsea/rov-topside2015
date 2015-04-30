@@ -455,7 +455,7 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range(len(self.thrusterLabels)):
 			stringOut += str(self.thrustFields[i].text()) + ","
 			
-		#self.config[str(self.combo.currentText())]['Map'] = stringOut
+		self.config[str(self.combo.currentText())]['Map'] = stringOut
 		if self.thrustRB.isChecked():
 			self.config[str(self.combo.currentText())]['Function'] = "Thruster"
 		elif self.manipRB.isChecked():
