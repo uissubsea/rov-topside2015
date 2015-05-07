@@ -8,7 +8,6 @@ import socket
 import threading
 import time
 import configparser
-import re
 from Controller import controller
 from PyQt4 import QtCore
 
@@ -46,87 +45,43 @@ class NetworkClient(QtCore.QThread):
 
 		self.receiver = Receiver()
 
-		self.controllerMap = []
-		self.stringMap = []
-		self.controlFunction = []
-
-		self.thrusterMap = []
-		self.manipMap = []
-		self.inverseMap = []
-
 		self.useManip = False
 		self.useThrust = False
 
 		self.running = True
 
-		self.thData = [0] * 4
-		self.manipData = [0] * 6
-
 
 	def run(self):
-		self.connect()
+		#self.connect()
 
 		# Start controller thread
 		self.control = controller.Controller()
 		# Start controller thread
 		self.control.start()
 
-		# Thread Loop
-
-		# Sleep 1 second for controller to be fully initialized Then configure
-		time.sleep(1)
-
-		self.configController()
-
-		
-
-		while self.connected:
-			while self.running:	
+		while True:
+			while True:	
 
 				# Start Receiver Thread
 				#self.receiver.start()
 			
-				# Get newest Joystick data
-
-				self.axis_data = self.control.axisData
-				self.button_data = self.control.axisData
-
-				#for i in range(4):
-				#	self.thData[i] = self.axis_data[0][self.thrusterMap[i]]
-
-				for i in range(len(self.axis_data)):
-					if(self.controlFunction[i] == "Thruster"):
-						self.useThrust = True
-						for j in range(len(self.thrusterMap)):
-							value = self.axis_data[i][self.thrusterMap[j]]
-							#if j == 0 or j == 2:
-							#	self.thData[j] = value * -1
-							#else:
-							self.thData[j] = value
-							
-					
-					elif(self.controlFunction[i] == "Manip"):
-						self.useManip = True
-						for j in range(len(self.manipMap)):
-							value = self.axis_data[i][self.manipMap[j]]
-							if j == 4 or j == 5:
-								self.manipData[j] = value + 107
-							else:
-								self.manipData[j] = value
+				# Process controller and get newest data
+				self.control.process_controller()
 
 				# Only send data if controller status changed
 				if (self.control.changed):
 
-					self.str = self.serialize(self.thData, self.manipData)
+					self.str = self.serialize(self.control.thData, self.control.manipData)
 
-					self.sock.sendall(bytes(self.str, 'UTF-8'))
+					print(self.str)
+					#self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 					# Receive Data from ROV and log
 
-					self.data = self.sock.recv(128)
+					#self.data = self.sock.recv(128)
 					#self.parse_data(self.data.decode("UTF-8"))
 
-					print(self.data, "\r", end="")
+					#print(self.data, "\r", end="")
 
 				
 				time.sleep(0.05)
@@ -136,17 +91,10 @@ class NetworkClient(QtCore.QThread):
 		# Create ASCII string to contain data
 		string = ""
 		# Loop through first 4 data. Assume they are thruster values
-		if self.useThrust:
-			for item in self.thData:
-				string += str(item) + ","
-		elif not self.useThrust:
-			string += "0,0,0,0,"
-		if self.useManip:
-			for item in self.manipData:
-				string += str(item) + ","
-		elif not self.useManip:
-			string += "0,0,0,0,0,0,"
-
+		for item in thData:
+			string += str(item) + ","
+		for item in manipData:
+			string += str(item) + ","
 
 		return string
 
@@ -178,29 +126,6 @@ class NetworkClient(QtCore.QThread):
 		
 		self.sock.settimeout(None)
 
-
-	def configController(self):
-		# Multi dimensional List to hold maps for all controllers
-		for i in range(len(self.control.controllerNames)):
-			self.controllerMap.append([0] * (self.control.controllerNumAxis[i] + 1))
-
-		# Get map for each controller
-		for idx, controller in enumerate(self.control.controllerNames):
-			self.stringMap.append(self.config[str(controller)]["Map"])
-			self.controlFunction.append(self.config[str(controller)]["Function"])
-			self.controllerMap[idx] = re.findall(r'\d+', self.stringMap[idx])
-
-		print(self.controlFunction)
-		# Make ints of list
-		for i in range(len(self.controllerMap)):
-			for j in range(len(self.controllerMap[i])):
-				self.controllerMap[i][j] = int(self.controllerMap[i][j])
-
-		for i in range(len(self.controllerMap)):
-			if(self.controlFunction[i] == "Thruster"):
-				self.thrusterMap = self.controllerMap[i]
-			elif(self.controlFunction[i] == "Manip"):
-				self.manipMap = self.controllerMap[i]
 
 	def log(self, string, logType):
 		self.updateStatus.emit()
