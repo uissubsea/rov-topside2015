@@ -10,11 +10,15 @@ import sdl2
 import sdl2.ext
 import time
 import configparser
-from PyQt4 import QtCore
+from PyQt4 import QtCore, QtGui
+
 
 CIRCLE = True
 
 class Controller(QtCore.QThread):
+	#gui-signal for calibreringsvindu:
+	calibrateNow = QtCore.pyqtSignal()
+	calibrateDone = QtCore.pyqtSignal()
 
 	def __init__(self):
 		super(Controller, self).__init__()
@@ -47,6 +51,8 @@ class Controller(QtCore.QThread):
 		# Define Qt Signals
 		self.ControlAdded = QtCore.pyqtSignal(str)
 		self.AxisChanged = QtCore.pyqtSignal(str)
+
+		
 
 
 	def run(self):
@@ -237,12 +243,6 @@ class Controller(QtCore.QThread):
 		else:
 			print("No Controller detected, Connect now")
 
-	def connected_controllers(self):
-		controllerList = []
-		for i in range(len(self.controllers)):
-			controllerList.append(str(sdl2.SDL_JoystickNameForIndex(i)))
-
-		return controllerList
 
 
 	def calibrate(self):
@@ -255,6 +255,7 @@ class Controller(QtCore.QThread):
 		sdl2.SDL_JoystickUpdate()
 
 		# While loop to determine max min values
+		self.calibrateNow.emit()
 		print("No controller config for this model was found")
 		print("Calibration is required\n")
 		print("Move all joystick axes and press main button when done")		
@@ -293,6 +294,8 @@ class Controller(QtCore.QThread):
 			self.config.write(configfile)
 
 		print("Done calibrating")
+		self.calibrateDone.emit()
+
 
 	def closeController(self):
 		# Close controller
@@ -302,3 +305,11 @@ class Controller(QtCore.QThread):
 		for i in range(len(self.controllers)):
 			sdl2.SDL_JoystickClose(self.controllers[i])
 			print("Closed controller %s" %(self.controllers[i]))
+
+
+
+
+
+
+
+

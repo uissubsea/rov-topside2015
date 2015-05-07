@@ -3,6 +3,7 @@ import time
 from PyQt4 import QtCore, QtGui
 from Controller import controller
 import configparser
+from Gui import openMsgBox
 
 
 class ConfigWindow(QtGui.QWidget):
@@ -16,6 +17,8 @@ class ConfigWindow(QtGui.QWidget):
 		self.config.read('Config/controller.cfg')
 
 		self.control.start()
+
+		self.control.calibrateNow.connect(self.openCalibrateMsgBox)
 
 		self.initUI()
 
@@ -50,8 +53,15 @@ class ConfigWindow(QtGui.QWidget):
 
 
 
+
 		self.show()
 	
+	def openCalibrateMsgBox(self):
+		self.CalibrateMB = openMsgBox.Calibrate()
+		self.control.calibrateDone.connect(self.closeCalibrateMsgBox)
+
+	def closeCalibrateMsgBox(self):
+		self.CalibrateMB.doneCalibrating()
 
 	# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	# Main buttons:
@@ -99,7 +109,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.manipRB = QtGui.QRadioButton('Manipulator', self.keyBindingsTab)
 		self.manipRB.move(442, 60)
 		
-		num = len(self.controllerList) # hent len(listOfControllers)
+		num = len(self.control.controllerNames) # hent len(listOfControllers)
 		if (num < 1):
 			self.activateManipButtons(False)
 			self.activateThrustButtons(False)
@@ -107,6 +117,7 @@ class ConfigWindow(QtGui.QWidget):
 			self.thrustRB.setEnabled(False)
 			self.manipRB.setEnabled(False)
 		elif (num == 1):	
+			# nå: én kontroller kan styre alt, evnt: én kontroller kan kun enten styre thrust eller manip
 			self.activateManipButtons(True)
 			self.activateThrustButtons(True)
 			self.activateOtherButtons(True)
@@ -192,9 +203,8 @@ class ConfigWindow(QtGui.QWidget):
 		
 		# wait two seconds for controllers to initialize
 		time.sleep(0.2)
-		self.controllerList = self.control.connected_controllers()
-		for i in range (len(self.controllerList)):
-			self.combo.addItem(self.controllerList[i])
+		for i in range (len(self.control.controllerNames)):
+			self.combo.addItem(str(self.control.controllerNames[i]))
 
 
 	def addManipulatorGBContents(self):
@@ -206,7 +216,6 @@ class ConfigWindow(QtGui.QWidget):
 		clawLabel.setGeometry(25, 27, 150, 20)
 		armLabel = QtGui.QLabel('Arm:', self.manipulatorGB)
 		armLabel.setGeometry(215, 27, 150, 20)
-
 
 		self.manipLabels = ['Open', 'Grip', 'Tilt', 'Rotate cw/ccw', 
 					'Raise/Lower', 'Bend/Stretch']
@@ -226,7 +235,6 @@ class ConfigWindow(QtGui.QWidget):
 			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.manipFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setManipField)
 		
-		
 		# Add illustration:
 		self.maImg = QtGui.QLabel(self.keyBindingsTab)
 		self.maImg.setScaledContents(True)
@@ -241,8 +249,7 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersFields = []
 
 		# Add labels:
-		self.othersLabel = ['Lights', 'Cam. 1', 'Cam. 2', 'Cam. 3', 'Laser',
-								'Hold ground']
+		self.othersLabel = ['Lights', 'Cam. 1', 'Cam. 2', 'Cam. 3', 'Laser', 'Hold ground']
 
 		xpos = [20, 20, 210, 210, 400, 400]
 		ypos = [30, 60, 30, 60, 30, 60]
@@ -453,41 +460,30 @@ class ConfigWindow(QtGui.QWidget):
 		thrustOrMan = ""
 		for i in range(len(self.thrusterLabels)):
 			stringOut += str(self.thrustFields[i].text()) + ","
-			
-		self.config[str(self.combo.currentText())]['Map'] = stringOut
-		if self.thrustRB.isChecked():
-			self.config[str(self.combo.currentText())]['Function'] = "Thruster"
-		elif self.manipRB.isChecked():
-			self.config[str(self.combo.currentText())]['Function'] = "Manip"
-		else:
-			self.config[str(self.combo.currentText())]['Function'] = "Thruster"
 
+
+		try:
+			self.config[str(self.combo.currentText())]['Map'] = stringOut
+		
+			if self.thrustRB.isChecked():
+				self.config[str(self.combo.currentText())]['Function'] = "Thruster"
+			elif self.manipRB.isChecked():
+				self.config[str(self.combo.currentText())]['Function'] = "Manip"
+			else:
+				self.config[str(self.combo.currentText())]['Function'] = "Thruster"
+
+		except KeyError:
+			print('knappefeil')
 
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
 
-		self.applyOK = QtGui.QWidget()
-		self.applyOK.resize(300, 110)
-		lbl = QtGui.QLabel('Controller settings have\nsuccessfully been updated!', self.applyOK)
-		lbl.setGeometry(90,17,300,60)
-		okBtn = QtGui.QPushButton('OK', self.applyOK)
-		okBtn.setGeometry(105, 73, 90, 32)
-		icon = QtGui.QLabel(self.applyOK)
-		icon.setScaledContents(True)
-		icon.setGeometry(20,25,50,50)
-		thumb = QtGui.QPixmap('Gui/RESOURCES/thumb.png')
-		icon.setPixmap(thumb)
-		self.applyOK.show()
+		self.aboutMB = openMsgBox.Apply()
 
-		okBtn.clicked.connect(self.applyOKHandler)
-
-
-	def applyOKHandler(self):
-		self.applyOK.close()
-
+	
 
 	def resetButtonHandler(self):
-		# first, open "are-you-sure" window
+		# first, open "are-you-sure" window		
 		self.sw = QtGui.QWidget()
 		self.sw.resize(400, 160)
 		
@@ -512,6 +508,7 @@ class ConfigWindow(QtGui.QWidget):
 		yesBtn.clicked.connect(self.resetYesHandler)
 		noBtn.clicked.connect(self.resetNoHandler)
 
+
 	def resetYesHandler(self):
 		self.thLinSlider.setValue(self.th_LIN_DEFAULT)
 		self.thExpSlider.setValue(self.th_EXP_DEFAULT)
@@ -527,6 +524,7 @@ class ConfigWindow(QtGui.QWidget):
 
 	def resetNoHandler(self):
 		self.sw.close()
+		
 
 	def updateSliders(self):
 		self.thLinSliderValue.setText(str(self.thLinSlider.value()))

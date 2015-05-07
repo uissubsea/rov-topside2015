@@ -7,27 +7,7 @@ Elisabeth - UiS Subsea 2015
 
 import sys
 from PyQt4 import QtGui, QtCore
-#sys.path.insert(1, '../Joystick')
-#import joystick_old_version as js
 
-
-##############################################################################
-# TODO
-# Hent styrekontrollverdier og tilegn verdien til glob.vars (se over), som 
-# igjen styrer prosessbarene i widgeten. 
-# På sikt, hent verdier direkte fra thrusterene.
-#
-# Må nok også lage en fordelingsfunksjon slik at max/min tilsvarer lengden på 
-# baren.
-#
-# OBS! Etterhver, lag en metode i joystick.py som leser alle kontrollerverdier,
-# som så kan hentes ut til de widgeter som måtte trenge dataene. (Kan ikke 
-# åpne joysticken mer enn én gang!)
-#
-# Men enn sålenge gjør vi som her, og leser stikkeverdier individuelt :)
-# ---> se manipulatorwidget.py
-#
-##############################################################################
 
 class ThrusterWidget(QtGui.QWidget):
 

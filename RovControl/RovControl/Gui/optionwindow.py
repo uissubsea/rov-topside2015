@@ -25,6 +25,7 @@ except AttributeError:
 
 class Ui_OptionsWindow(object):
     def setupUi(self, OptionsWindow):
+        print('opt')
         OptionsWindow.setObjectName(_fromUtf8("OptionsWindow"))
         OptionsWindow.resize(620, 455)
         self.gridLayout = QtGui.QGridLayout(OptionsWindow)

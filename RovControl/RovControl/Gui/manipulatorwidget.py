@@ -9,37 +9,7 @@ Elisabeth - UiS Subsea 2015
 import sys
 from PyQt4 import QtGui, QtCore
 from Controller import controller
-#sys.path.insert(1, '../Joystick')
-#import joystick_old_version as js
 
-##############################################################################
-# Global variables:
-'''# (Range: [-100, 100]% <--> [-30, 30])?
-
-m1 = 0
-m2 = 0
-m3 = 0
-m4 = 0
-m5 = 0
-'''
-
-##############################################################################
-#
-# Hent styrekontrollverdier og tilegn verdien til glob.vars (se over), som 
-# igjen styrer prosessbarene i widgeten. 
-# På sikt, hent verdier direkte fra manipulatormotorene.
-#
-# Må nok også lage en fordelingsfunksjon slik at max/min tilsvarer lengden på 
-# baren.
-#
-# OBS! Etterhver, lag en metode i joystick.py som leser alle kontrollerverdier,
-# som så kan hentes ut til de widgeter som måtte trenge dataene. (Kan ikke 
-# åpne joysticken mer enn én gang!)
-#
-# Men enn sålenge gjør vi som her, og leser stikkeverdier individuelt :)
-# ---> se thrusterwidget.py
-#
-##############################################################################
 
 class ManipulatorWidget(QtGui.QWidget):
 
@@ -67,11 +37,9 @@ class ManipulatorWidget(QtGui.QWidget):
 		self.setGeometry(0, 0, 400, 270)
 		self.setMaximumSize (400, 270)
 		self.setMinimumSize(400, 270)
-		#self.center()
 		self.setWindowTitle('Manipulator status')
 		self.addGraphics()	
 		self.addLabels()	
-		#self.show()
 
 	
 	# paintEvent kalles automatisk med QWidget.update() !!! Jippiyay :D
@@ -108,7 +76,7 @@ class ManipulatorWidget(QtGui.QWidget):
 
 
 	def updateData(self):
-		#global m1, m2, m3, m4, m5
+		
 		'''
 		self.m1 = self.axis_data[0]
 		self.m2 = self.axis_data[1]
@@ -116,13 +84,7 @@ class ManipulatorWidget(QtGui.QWidget):
 		self.m4 = self.axis_data[3]
 		self.m5 = self.axis_data[4]
 		'''
-		#print(self.m1)
-		# Read controller values:
-		#m1 = int(self.controller.read_axis(0,1000))
-		#m2 = int(self.controller.read_axis(3,1000))
-		#m3 = int(self.controller.read_axis(4,1000))
-		#m4 = int(self.controller.read_axis(1,1000))
-		#m5 = int(self.controller.read_axis(2,1000))
+		
 
 		# Re-draw process bars:
 		self.updateProcessBars()

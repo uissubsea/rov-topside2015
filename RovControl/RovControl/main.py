@@ -8,7 +8,7 @@ sys.path.insert(1, "../RovControl")
 from PyQt4 import QtGui, QtCore
 from Gui import mainwindow, settingswindow, statuswindow, pod1, pod2, cntrconfig2
 from Gui import testWindow, manipulatorwidget, thrusterwidget, depthsensor
-from Gui import camerawindow, about
+from Gui import camerawindow, about#, openMsgBox
 from RovNetwork import networkclient
 
 ##############################################################################
