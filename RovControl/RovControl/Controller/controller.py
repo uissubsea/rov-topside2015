@@ -10,6 +10,7 @@ import sdl2
 import sdl2.ext
 import time
 import configparser
+import re
 from PyQt4 import QtCore
 
 CIRCLE = True
@@ -26,6 +27,8 @@ class Controller(QtCore.QThread):
 
 		sdl2.SDL_Init(sdl2.SDL_INIT_JOYSTICK)
 		sdl2.SDL_JoystickEventState(sdl2.SDL_ENABLE)
+
+		self.changed = False
 		
 		# List to hold references to connected controllers
 		self.controllers = []
@@ -44,6 +47,18 @@ class Controller(QtCore.QThread):
 		self.controllerDeadZone = []
 		self.controllerSmooth = []
 
+		self.controllerMap = []
+		self.stringMap = []
+		self.controlFunction = []
+
+		self.thrusterMap = []
+		self.manipMap = []
+		self.inverseMap = []
+
+		self.thData = [0] * 4
+		self.manipData = [0] * 6
+
+
 		# Define Qt Signals
 		self.ControlAdded = QtCore.pyqtSignal(str)
 		self.AxisChanged = QtCore.pyqtSignal(str)
@@ -55,6 +70,8 @@ class Controller(QtCore.QThread):
 		for i in range(sdl2.SDL_NumJoysticks()):
 			self.open_controller(i)
 		
+		self.configController()
+
 		# Get events
 		if self.inSettings == False:
 
@@ -244,6 +261,38 @@ class Controller(QtCore.QThread):
 
 		return controllerList
 
+	def configController(self):
+
+		# Get map for each controller
+		for idx, controller in enumerate(self.controllerNames):
+			self.thrusterMap.append(self.config[str(controller)]["ThMap"])
+			self.manipMap.append(self.config[str(controller)]["ManipMap"])
+			self.thrusterMap[idx] = re.findall(r'\d+', self.thrusterMap[idx])
+			self.manipMap[idx] = re.findall(r'\d+', self.manipMap[idx])
+
+		# Convert from string to int
+		for i in range(len(self.controllerNames)):
+			for j in range(len(self.thrusterMap[i])):
+				self.thrusterMap[i][j] = int(self.thrusterMap[i][j])
+
+		for i in range(len(self.controllerNames)):
+			for j in range(len(self.manipMap[i])):
+				self.manipMap[i][j] = int(self.manipMap[i][j])
+
+	def process_controller(self):
+		
+		for i in range(len(self.axisData)):
+			for j in range(len(self.thrusterMap[i])):
+				valueTh = self.axisData[i][self.thrusterMap[i][j]]
+				#if j == 0 or j == 2:
+				#	self.thData[j] = value * -1
+				#else:
+				self.thData[j] = valueTh
+			for j in range(len(self.manipMap[i])):
+				valueManip = self.axisData[i][self.manipMap[i][j]]
+				self.manipData[j] = valueManip
+
+
 
 	def calibrate(self):
 		# If We have entered this function, the config has no
@@ -262,6 +311,10 @@ class Controller(QtCore.QThread):
 		# Add default deadzone and filter
 		self.config[str(self.controllerNames[-1])]['DEAD_ZONE'] = '100'
 		self.config[str(self.controllerNames[-1])]['SMOOTH'] = '29'
+
+		# Add map subsection
+		self.config[str(self.controllerNames[-1])]['ManipMap'] = ''
+		self.config[str(self.controllerNames[-1])]['thMap'] = ''
 
 		self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
 		self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))

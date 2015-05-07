@@ -186,7 +186,7 @@ class MainWidget(QtGui.QMainWindow):
 
     def exit(self):
         # Stop Network client
-        self.netClient.disconnect()
+        #self.netClient.disconnect()
         self.close()
         print("Stopped?")
         sys.exit()
