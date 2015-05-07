@@ -1,9 +1,9 @@
-import sys
-import time
+import sys, os, time
 from PyQt4 import QtCore, QtGui
 from Controller import controller
 import configparser
 from Gui import openMsgBox
+import platform
 
 
 class ConfigWindow(QtGui.QWidget):
@@ -51,11 +51,9 @@ class ConfigWindow(QtGui.QWidget):
 		self.addSensTab()
 		self.addMainButtons()
 
-
-
-
 		self.show()
 	
+
 	def openCalibrateMsgBox(self):
 		self.CalibrateMB = openMsgBox.Calibrate()
 		self.control.calibrateDone.connect(self.closeCalibrateMsgBox)
@@ -109,7 +107,13 @@ class ConfigWindow(QtGui.QWidget):
 
 		self.addControllerBox(self.controllerTab)
 
-
+		img = QtGui.QLabel(self.controllerTab)
+		img.setScaledContents(True)
+		img.setGeometry(50,130, 886*0.6,470*0.6)
+		xbox = QtGui.QPixmap('Gui/RESOURCES/xbox360.jpg')
+		img.setPixmap(xbox)
+		
+		
 	def addSensTab(self):
 		self.sensitivityTab = QtGui.QWidget()
 		self.tabwindow.addTab(self.sensitivityTab, "Sensitivity")
@@ -149,7 +153,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60]
 
 		for i in range(len(xpos)):
-			self.thrustFields.append(QtGui.QLabel('____', self.thrusterGB))
+			self.thrustFields.append(QtGui.QLabel('', self.thrusterGB))
 			self.thrustFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.thrustFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setThrusterField)
 
@@ -169,11 +173,11 @@ class ConfigWindow(QtGui.QWidget):
 		self.comboLabel.setGeometry(22, 25, 200, 30)
 		self.combo = QtGui.QComboBox(tab)
 		self.combo.setGeometry(223, 27, 200, 30)
-		
+
 		# wait two seconds for controllers to initialize
 		time.sleep(0.2)
 		for i in range (len(self.control.controllerNames)):
-			self.combo.addItem(str(self.control.controllerNames[i]))
+			self.combo.addItem(str(self.control.controllerNames[i]))	
 
 
 	def addManipulatorGBContents(self):
@@ -200,7 +204,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [50, 80, 110, 140, 50, 80]
 		
 		for i in range(len(self.manipLabels)): 
-			self.manipFields.append(QtGui.QLabel('____', self.manipulatorGB))
+			self.manipFields.append(QtGui.QLabel('', self.manipulatorGB))
 			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.manipFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setManipField)
 		
@@ -232,7 +236,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60, 30, 60]
 		
 		for i in range(len(self.othersLabel)): 
-			self.othersFields.append(QtGui.QLabel('____', self.othersGB))
+			self.othersFields.append(QtGui.QLabel('', self.othersGB))
 			self.othersFields[i].setGeometry(xpos[i], ypos[i], 50, 20)
 			self.othersFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setOthersField)
 	

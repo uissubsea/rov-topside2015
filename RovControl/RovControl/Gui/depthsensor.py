@@ -19,7 +19,7 @@ class DepthWidget(QtGui.QWidget):
 
 	def initUI(self):
 		# Draw widget window:
-		w = 250
+		w = 370
 		h = 150
 		self.setGeometry(100, 100, w, h)
 		self.setMaximumSize (w, h)
