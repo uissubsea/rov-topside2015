@@ -142,13 +142,13 @@ class MainWidget(QtGui.QMainWindow):
         self.ui8.textEdit.setReadOnly(True)
 
     def open_pod1(self):
-        self.pod1Window = pod1.SubWindow()
+        self.pod1Window = pod1.Pod1Status()
         self.subwindow9.setWidget(self.pod1Window)
         self.ui.mdiArea.addSubWindow(self.subwindow9)
         self.pod1Window.show()
 
     def open_pod2(self):
-        self.pod2Window = pod2.SubWindow()
+        self.pod2Window = pod2.Pod2Status()
         self.subwindow10.setWidget(self.pod2Window)
         self.ui.mdiArea.addSubWindow(self.subwindow10)
         self.pod2Window.show()

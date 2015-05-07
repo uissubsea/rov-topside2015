@@ -68,7 +68,6 @@
     </property>
     <addaction name="actionController"/>
     <addaction name="separator"/>
-    <addaction name="actionOption"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
