@@ -5,7 +5,6 @@ pluss evnt. tidshistorikk x antall målinger/tidsenheter tilbake i tid.
 
 import sys
 from PyQt4 import QtGui, QtCore
-from pyqtgraph import PlotWidget as pw
 # bruk joystick som tester for real-time plott fram til sensor kobles til :)
 
 
@@ -42,10 +41,6 @@ class DepthWidget(QtGui.QWidget):
         
 		if ok:
 			self.pressureLabel.setText(str(self.y))
-
-
-	def addPlotItem(self):
-		self.plotItem = pyqtgraph.PlotItem()
 
 
 	def getPressure(self):
