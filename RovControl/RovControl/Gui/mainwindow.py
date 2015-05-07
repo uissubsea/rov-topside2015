@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MainWindow.ui'
+# Form implementation generated from reading ui file 'RESOURCES/MainWindow.ui'
 #
-# Created: Thu Apr 16 14:03:31 2015
+# Created: Mon Apr 27 14:04:00 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -77,10 +77,10 @@ class Ui_MainWindow(object):
         self.actionThursters.setObjectName(_fromUtf8("actionThursters"))
         self.actionDepth_sensor = QtGui.QAction(MainWindow)
         self.actionDepth_sensor.setObjectName(_fromUtf8("actionDepth_sensor"))
-        self.actionUiS_Subsea = QtGui.QAction(MainWindow)
-        self.actionUiS_Subsea.setObjectName(_fromUtf8("actionUiS_Subsea"))
-        self.actionNjord_v_2_8_1_beta = QtGui.QAction(MainWindow)
-        self.actionNjord_v_2_8_1_beta.setObjectName(_fromUtf8("actionNjord_v_2_8_1_beta"))
+        self.actionAboutUs = QtGui.QAction(MainWindow)
+        self.actionAboutUs.setObjectName(_fromUtf8("actionAboutUs"))
+        self.actionAboutVehicle = QtGui.QAction(MainWindow)
+        self.actionAboutVehicle.setObjectName(_fromUtf8("actionAboutVehicle"))
         self.actionOption = QtGui.QAction(MainWindow)
         self.actionOption.setObjectName(_fromUtf8("actionOption"))
         self.actionConnect = QtGui.QAction(MainWindow)
@@ -91,8 +91,8 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionDisconnect)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
-        self.menuAbout.addAction(self.actionUiS_Subsea)
-        self.menuAbout.addAction(self.actionNjord_v_2_8_1_beta)
+        self.menuAbout.addAction(self.actionAboutUs)
+        self.menuAbout.addAction(self.actionAboutVehicle)
         self.menuView.addAction(self.actionCamera_1)
         self.menuView.addAction(self.actionCamera_2)
         self.menuView.addAction(self.actionCamera_3)
@@ -120,7 +120,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "RovControl V1.0a", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "RovControl v 0.1a", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuAbout.setTitle(_translate("MainWindow", "About", None))
         self.menuView.setTitle(_translate("MainWindow", "View", None))
@@ -140,8 +140,8 @@ class Ui_MainWindow(object):
         self.actionManipulator.setText(_translate("MainWindow", "Manipulator", None))
         self.actionThursters.setText(_translate("MainWindow", "Thursters", None))
         self.actionDepth_sensor.setText(_translate("MainWindow", "Depth sensor", None))
-        self.actionUiS_Subsea.setText(_translate("MainWindow", "UiS Subsea", None))
-        self.actionNjord_v_2_8_1_beta.setText(_translate("MainWindow", "Njord v.2.8.1 beta", None))
+        self.actionAboutUs.setText(_translate("MainWindow", "UiS Subsea", None))
+        self.actionAboutVehicle.setText(_translate("MainWindow", "Njord v.2.8.1 beta", None))
         self.actionOption.setText(_translate("MainWindow", "Options", None))
         self.actionConnect.setText(_translate("MainWindow", "Connect", None))
         self.actionDisconnect.setText(_translate("MainWindow", "Disconnect", None))

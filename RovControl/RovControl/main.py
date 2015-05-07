@@ -110,8 +110,8 @@ class MainWidget(QtGui.QMainWindow):
         #   --> on-top widgets:
         self.ui.actionOption.triggered.connect(self.open_options)
         self.ui.actionController.triggered.connect(self.open_controllerConfig)
-        self.ui.actionUiS_Subsea.triggered.connect(self.open_aboutUiSSubsea)
-        #self.ui.actionAboutROV.triggered.connect(self.open_aboutROV)
+        self.ui.actionAboutUs.triggered.connect(self.open_aboutUiSSubsea)
+        self.ui.actionAboutVehicle.triggered.connect(self.open_aboutROV)
         #   --> integrated widgets:
         self.ui.actionCamera_1.triggered.connect(self.open_cam1)
         self.ui.actionCamera_2.triggered.connect(self.open_cam2)
@@ -164,7 +164,7 @@ class MainWidget(QtGui.QMainWindow):
         self.optWindow = QtGui.QWidget()
         self.ui1 = optionwindow.Ui_OptionsWindow()
         self.ui1.setupUi(self.optWindow)
-        self.subwindow1.setWidget(self.optWindow)
+        #self.subwindow1.setWidget(self.optWindow)
         self.optWindow.show()
 
     def open_controllerConfig(self):

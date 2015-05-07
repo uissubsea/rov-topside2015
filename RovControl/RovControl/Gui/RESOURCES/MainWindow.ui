@@ -42,8 +42,8 @@
     <property name="title">
      <string>About</string>
     </property>
-    <addaction name="actionUiS_Subsea"/>
-    <addaction name="actionNjord_v_2_8_1_beta"/>
+    <addaction name="actionAboutUs"/>
+    <addaction name="actionAboutVehicle"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -156,12 +156,12 @@
     <string>Depth sensor</string>
    </property>
   </action>
-  <action name="actionUiS_Subsea">
+  <action name="actionAboutUs">
    <property name="text">
     <string>UiS Subsea</string>
    </property>
   </action>
-  <action name="actionNjord_v_2_8_1_beta">
+  <action name="actionAboutVehicle">
    <property name="text">
     <string>Njord v.2.8.1 beta</string>
    </property>
