@@ -1,7 +1,6 @@
 import sys
 import time
 from PyQt4 import QtCore, QtGui
-from pyqtgraph import PlotWidget
 from Controller import controller
 import configparser
 

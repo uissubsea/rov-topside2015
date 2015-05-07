@@ -12,88 +12,6 @@ from Gui import camerawindow, about
 from RovNetwork import networkclient
 
 ##############################################################################
-# Globale variable:
-
-start_modus = "" 
-
-class StartWindow(QtGui.QMainWindow):
-    
-    def __init__(self):
-        super(StartWindow, self).__init__()
-        self.initUI()
-        
-
-    def initUI(self):      
-
-        # Quit button
-        qbtn = QtGui.QPushButton('Quit', self)
-        qbtn.clicked.connect(QtCore.QCoreApplication.instance().quit)
-        qbtn.move(40, 350)
-
-        # Start button
-        sbtn = QtGui.QPushButton('Start', self)
-        sbtn.clicked.connect(self.startButtonHandler)
-        sbtn.move(500, 350)
-
-        # Combobox w/label
-        self.lbl = QtGui.QLabel("Select statup mode:", self)
-        self.lbl.setGeometry(200,270,150,15)
-        combo = QtGui.QComboBox(self)
-        combo.addItem("")
-        combo.addItem("Normal")
-        combo.addItem("Test")
-        # NB!!! Must mach conditions in method startButtonHandler()!
-        combo.setGeometry(194,290,252,28)
-        combo.activated[str].connect(self.onActivated)
-
-        # Image
-        self.img = QtGui.QLabel(self)
-        self.img.setScaledContents(True);
-        self.img.setGeometry(194,40,252,210) #xpos,ypos,w,h
-        
-        pxmp = QtGui.QPixmap('Gui/RESOURCES/subsea_logo.png')
-        self.img.setPixmap(pxmp) 
-
-        # Window settings
-        self.resize(640,400)
-        self.center()
-        self.setWindowTitle('UiS Subsea - startup')
-        self.setWindowIcon(QtGui.QIcon('Gui/RESOURCES/subsea_logo.png'))
-        self.show()
-     
-
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-    
-
-    # Closes startup window, opens program window
-    def startButtonHandler(self):
-
-        # reads global variable start_modus, and initiates next window
-        if start_modus == "Normal":
-            self.win = MainWidget()
-            self.hide()
-            self.win.show()
-         
-        elif start_modus == "Test":
-            self.close()
-            self.win = testWindow.Test1()
-            self.win.__init__()
-
-        # If no match, show help option:
-        else:
-            print("Please choose a program option")
-            
-
-    # Reads combobox option chosen by user
-    def onActivated(self, text):
-        global start_modus
-        start_modus = text
-
-##############################################################################
 
 class MainWidget(QtGui.QMainWindow):
     
@@ -146,16 +64,33 @@ class MainWidget(QtGui.QMainWindow):
 
         # Network Client Thread
         self.netClient = networkclient.NetworkClient()
+
+        self.netClient.updateStatus.connect(self.update_statusWindow)
+
+        # Create Status window for later use
+        self.statWindow = QtGui.QWidget()
+        self.ui8 = statuswindow.Ui_StatusWindow()
+        self.ui8.setupUi(self.statWindow)
+        self.subwindow8.setWidget(self.statWindow)
+        self.ui.mdiArea.addSubWindow(self.subwindow8)
+        self.ui8.textEdit.setReadOnly(True)
+        self.open_logFile()
+
+    def update_statusWindow(self):
+        try:
+            self.ui8.textEdit.setText(self.stream.readAll())
+        except AttributeError as e:
+            print(e)
         
 
     def open_logFile(self):
          # Create Q Text Stream for status window
-        print("awdawawdaw")
-        self.logFile = QtCore.QFile('status.log')
+        self.logFile = QtCore.QFile('Log/status.log')
+        self.logFile.resize(0)
         try:
             self.logFile.open(QtCore.QIODevice.ReadOnly)
             self.stream = QtCore.QTextStream(self.logFile)
-            self.ui.textEdit.setText(self.stream.readAll())
+            self.ui8.textEdit.setText(self.stream.readAll())
         except AttributeError as e:
             print(e)
 
@@ -204,7 +139,7 @@ class MainWidget(QtGui.QMainWindow):
         self.subwindow8.setWidget(self.statWindow)
         self.ui.mdiArea.addSubWindow(self.subwindow8)
         self.statWindow.show()
-        self.open_logFile()
+        self.ui8.textEdit.setReadOnly(True)
 
     def open_pod1(self):
         self.pod1Window = pod1.SubWindow()
@@ -242,13 +177,12 @@ class MainWidget(QtGui.QMainWindow):
         self.netClient.start()
 
         self.netClient.running = True
-        #self.open_statusWindow()
-        self.netClient.connect()
+        self.open_statusWindow()
+        #self.netClient.connect()
 
     def disconnect(self):
         # Stop Network client
         self.netClient.disconnect()
-
 
     def exit(self):
         # Stop Network client

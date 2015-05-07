@@ -8,11 +8,9 @@
 import sys
 import sdl2
 import sdl2.ext
-import threading
 import time
 import configparser
 from PyQt4 import QtCore
-
 
 CIRCLE = True
 

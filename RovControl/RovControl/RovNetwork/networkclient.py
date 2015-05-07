@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 #Create File Handler
 
-handler = logging.FileHandler('status.log')
+handler = logging.FileHandler('Log/status.log')
 handler.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -29,18 +29,20 @@ logger.addHandler(handler)
 
 
 class NetworkClient(QtCore.QThread):
-	def __init__(self, address="192.168.1.20", port=50000):
+	
+	# Signal to update statusWindow
+	updateStatus = QtCore.pyqtSignal()
+
+	def __init__(self):
 		super(NetworkClient, self).__init__()
 
 		self.mutex = QtCore.QMutex
+
 
 		self.config = configparser.ConfigParser()
 		self.config.read('Config/controller.cfg')
 
 		self.rov_data = ["0","0","0","0","0"]
-
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.server_address = (address, port)
 
 		self.receiver = Receiver()
 
@@ -62,6 +64,8 @@ class NetworkClient(QtCore.QThread):
 
 
 	def run(self):
+		self.connect()
+
 		# Start controller thread
 		self.control = controller.Controller()
 		# Start controller thread
@@ -74,7 +78,9 @@ class NetworkClient(QtCore.QThread):
 
 		self.configController()
 
-		while True:
+		
+
+		while self.connected:
 			while self.running:	
 
 				# Start Receiver Thread
@@ -113,12 +119,6 @@ class NetworkClient(QtCore.QThread):
 
 					self.str = self.serialize(self.thData, self.manipData)
 
-					#print(self.thData)
-					#print(self.manipData)
-					#print(self.axis_data)
-
-					#print(self.str)
-
 					self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 					# Receive Data from ROV and log
@@ -154,18 +154,29 @@ class NetworkClient(QtCore.QThread):
 		self.running = False
 		# Disconnect from server
 		self.sock.close()
-		print("Disconnected from server, Goodbye")
-
-	def connect(self):
 		self.connected = False
-		logger.info("Connecting to ROV...")
+		self.log("Disconnected from server, Goodbye", "info")
+		self.terminate()
+
+	def connect(self, address="192.168.1.20", port=50000):
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.server_address = (address, port)
+
+		self.connected = False
+		self.sock.settimeout(5)
+		self.log("Connecting to ROV...", "info")
 		try:
 			self.sock.connect(self.server_address)
 			self.connected = True
-			logger.info("Connected!")
+			self.log("Connected!", "info")
 		except socket.error as msg:
 			# Log error
-			logger.error("Unable to connect!\n")
+			self.log("Unable to connect!\n", "error")
+		
+		if self.connected == False:
+			self.log("Failed to connect, make sure your ethernet ip is set to 192.168.1.2\n", "error")
+		
+		self.sock.settimeout(None)
 
 
 	def configController(self):
@@ -190,6 +201,13 @@ class NetworkClient(QtCore.QThread):
 				self.thrusterMap = self.controllerMap[i]
 			elif(self.controlFunction[i] == "Manip"):
 				self.manipMap = self.controllerMap[i]
+
+	def log(self, string, logType):
+		self.updateStatus.emit()
+		if logType == "error":
+			logger.error(string)
+		elif logType == "info":
+			logger.info(string)
 		
 
 class Receiver(QtCore.QThread):
