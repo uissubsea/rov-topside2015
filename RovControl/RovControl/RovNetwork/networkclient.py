@@ -37,6 +37,7 @@ class NetworkClient(QtCore.QThread):
 
 		self.mutex = QtCore.QMutex
 
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 		self.config = configparser.ConfigParser()
 		self.config.read('Config/controller.cfg')
@@ -52,15 +53,15 @@ class NetworkClient(QtCore.QThread):
 
 
 	def run(self):
-		#self.connect()
+		self.connect()
 
 		# Start controller thread
 		self.control = controller.Controller()
 		# Start controller thread
 		self.control.start()
 
-		while True:
-			while True:	
+		while self.connected:
+			while self.running:	
 
 				# Start Receiver Thread
 				#self.receiver.start()
@@ -73,15 +74,15 @@ class NetworkClient(QtCore.QThread):
 
 					self.str = self.serialize(self.control.thData, self.control.manipData)
 
-					print(self.str)
-					#self.sock.sendall(bytes(self.str, 'UTF-8'))
+					#print(self.str)
+					self.sock.sendall(bytes(self.str, 'UTF-8'))
 
 					# Receive Data from ROV and log
 
-					#self.data = self.sock.recv(128)
+					self.data = self.sock.recv(128)
 					#self.parse_data(self.data.decode("UTF-8"))
 
-					#print(self.data, "\r", end="")
+					print(self.data, "\r", end="")
 
 				
 				time.sleep(0.05)

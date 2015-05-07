@@ -12,6 +12,7 @@ import time
 import configparser
 from PyQt4 import QtCore, QtGui
 import re
+import math
 
 CIRCLE = True
 
@@ -61,6 +62,10 @@ class Controller(QtCore.QThread):
 		self.thData = [0] * 4
 		self.manipData = [0] * 6
 
+		self.ThLinValue = []
+		self.thExpvalue = []
+		self.manipExpValue = []
+		self.manipLinValue = []
 
 		# Define Qt Signals
 		self.ControlAdded = QtCore.pyqtSignal(str)
@@ -123,30 +128,24 @@ class Controller(QtCore.QThread):
 					for j in range(self.controllerNumAxis[i]): 
 				
 						if event.jaxis.axis == j:
-							value = int(event.jaxis.value/self.controllerSmooth[i])
+							value = int(event.jaxis.value)
 							if j == 1:
 								value = value *-1							
 							# Left- right movement (x)
 							#if event.jaxis.axis == 2:
 							#	value = value + 670
 							
-							if (value > -self.controllerDeadZone[i] and value < self.controllerDeadZone[i]):
+							if (value > -self.controllerDeadZone[i]*50 and value < self.controllerDeadZone[i]*50):
 								#Inside Dead zone
 								self.axisData[i][j] = 0
 
-							elif (value < -self.controllerDeadZone[i]):
+							elif (value < -self.controllerDeadZone[i]*50):
 								value = value + self.controllerDeadZone[i]
-								if (value < -1000):
-									self.axisData[i][j] = -1000
-								else:
-									self.axisData[i][j] = value
+								self.axisData[i][j] = value
 					
-							elif (value > self.controllerDeadZone[i]):
+							elif (value > self.controllerDeadZone[i]*50):
 								value = value - self.controllerDeadZone[i]
-								if (value > 1000):
-									self.axisData[i][j] = 1000
-								else:
-									self.axisData[i][j] = value
+								self.axisData[i][j] = value
 
 
 		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
@@ -177,30 +176,18 @@ class Controller(QtCore.QThread):
 					for j in range(self.controllerNumAxis[i]): 
 				
 						if event.jaxis.axis == j:
-							value = int(event.jaxis.value/self.controllerSmooth[i])
+							value = int(event.jaxis.value)
 							# Left- right movement (x)
 							#if event.jaxis.axis == 2:
 							#	value = value + 670
-							
-							if (value > -self.controllerDeadZone[i] and value < self.controllerDeadZone[i]):
-								#Inside Dead zone
-								self.axisData[i][j] = 0
 
-							elif (value < -self.controllerDeadZone[i]):
+							if (value < -5000):
 								value = value + self.controllerDeadZone[i]
 								self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(j))
-								if (value < -1000):
-									self.axisData[i][j] = -1000
-								else:
-									self.axisData[i][j] = value
-					
-							elif (value > self.controllerDeadZone[i]):
+						
+							elif (value > 5000):
 								value = value - self.controllerDeadZone[i]
 								self.emit(QtCore.SIGNAL('setText(QString)'), "Axis" + str(j))
-								if (value > 1000):
-									self.axisData[i][j] = 1000
-								else:
-									self.axisData[i][j] = value
 
 
 		elif event.type == sdl2.SDL_JOYBUTTONDOWN or event.type == sdl2.SDL_JOYBUTTONUP:
@@ -210,7 +197,6 @@ class Controller(QtCore.QThread):
 					
 					for j in range(self.controllerNumButtons[i]):
 						if event.jbutton.button == j:
-							self.buttonData[i][j] = event.jbutton.state
 							self.emit(QtCore.SIGNAL('setText(QString)'), "Btn" + str(j))
 							#print("Key pressed")
 							#self.running = False
@@ -248,17 +234,6 @@ class Controller(QtCore.QThread):
 			# Else Load data
 			if( not str(self.controllerNames[-1]) in self.config.sections()):
 				self.calibrate()
-			else:
-				try:
-					self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
-					self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
-					#self.CONTROLLER_SMOOTH = self.CONTROLLER_SMOOTH + self.DEAD_ZONE
-				except:
-					print("Error getting config values")
-
-		else:
-			print("No Controller detected, Connect now")
-
 
 	def configController(self):
 
@@ -266,8 +241,14 @@ class Controller(QtCore.QThread):
 		for idx, controller in enumerate(self.controllerNames):
 			self.thrusterMap.append(self.config[str(controller)]["ThMap"])
 			self.manipMap.append(self.config[str(controller)]["ManipMap"])
+			self.ThLinValue.append(self.config[str(controller)]["thlin"])
+			self.thExpvalue.append(self.config[str(controller)]["thExp"])
+			self.manipLinValue.append(self.config[str(controller)]["malin"])
+			self.manipExpValue.append(self.config[str(controller)]["maExp"])
 			self.thrusterMap[idx] = re.findall(r'\d+', self.thrusterMap[idx])
 			self.manipMap[idx] = re.findall(r'\d+', self.manipMap[idx])
+			self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
+			self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
 
 		# Convert from string to int
 		for i in range(len(self.controllerNames)):
@@ -278,17 +259,41 @@ class Controller(QtCore.QThread):
 			for j in range(len(self.manipMap[i])):
 				self.manipMap[i][j] = int(self.manipMap[i][j])
 
+		for i in range(len(self.controllerNames)):
+			self.ThLinValue[i] = int(self.ThLinValue[i])
+
+		for i in range(len(self.controllerNames)):
+			self.thExpvalue[i] = int(self.thExpvalue[i])
+
+		for i in range(len(self.controllerNames)):
+			self.manipLinValue[i] = int(self.manipLinValue[i])
+
+		for i in range(len(self.controllerNames)):
+			self.manipExpValue[i] = int(self.manipExpValue[i])
+
+
 	def process_controller(self):
 		
 		for i in range(len(self.axisData)):
 			for j in range(len(self.thrusterMap[i])):
 				valueTh = self.axisData[i][self.thrusterMap[i][j]]
+				if(self.ThLinValue[i] > 1):
+					valueTh = int(valueTh/self.ThLinValue[i])
+				else:
+					#Use exponential
+					valueTh = int(valueTh*0.02*math.pow(self.thExpvalue[i],3))
 				#if j == 0 or j == 2:
 				#	self.thData[j] = value * -1
 				#else:
 				self.thData[j] = valueTh
 			for j in range(len(self.manipMap[i])):
 				valueManip = self.axisData[i][self.manipMap[i][j]]
+				if(self.manipLinValue[i] > 1):
+					valueManip = int(valueManip/self.manipLinValue[i])
+				else:
+					#Use exponential
+					valueManip = int(valueManip*0.02*math.pow(self.manipExpValue[i],3))
+
 				self.manipData[j] = valueManip
 
 
@@ -315,6 +320,13 @@ class Controller(QtCore.QThread):
 		# Add map subsection
 		self.config[str(self.controllerNames[-1])]['ManipMap'] = ''
 		self.config[str(self.controllerNames[-1])]['thMap'] = ''
+		self.config[str(self.controllerNames[-1])]['btnMap'] = ''
+
+		# Add exp and lin values
+		self.config[str(self.controllerNames[-1])]['thLin'] = ''
+		self.config[str(self.controllerNames[-1])]['maLin'] = ''
+		self.config[str(self.controllerNames[-1])]['thExp'] = ''
+		self.config[str(self.controllerNames[-1])]['maExp'] = ''
 
 		self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
 		self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))

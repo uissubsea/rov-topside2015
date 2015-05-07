@@ -120,7 +120,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "RovControl v 0.1a", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "RovControl v1.0b", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuAbout.setTitle(_translate("MainWindow", "About", None))
         self.menuView.setTitle(_translate("MainWindow", "View", None))
@@ -141,7 +141,7 @@ class Ui_MainWindow(object):
         self.actionThursters.setText(_translate("MainWindow", "Thursters", None))
         self.actionDepth_sensor.setText(_translate("MainWindow", "Depth sensor", None))
         self.actionAboutUs.setText(_translate("MainWindow", "UiS Subsea", None))
-        self.actionAboutVehicle.setText(_translate("MainWindow", "Njord v.2.8.1 beta", None))
+        self.actionAboutVehicle.setText(_translate("MainWindow", "Empty", None))
         self.actionOption.setText(_translate("MainWindow", "Options", None))
         self.actionConnect.setText(_translate("MainWindow", "Connect", None))
         self.actionDisconnect.setText(_translate("MainWindow", "Disconnect", None))

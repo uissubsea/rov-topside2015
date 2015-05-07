@@ -50,10 +50,6 @@ class ConfigWindow(QtGui.QWidget):
 		self.addControllerTab()
 		self.addSensTab()
 		self.addMainButtons()
-
-
-
-
 		self.show()
 	
 	def openCalibrateMsgBox(self):
@@ -128,6 +124,9 @@ class ConfigWindow(QtGui.QWidget):
 		self.maSpeedGB.setGeometry(20, 310, self.w - 89, 150)
 		self.addMaSpeedGBContents()
 
+		# Get latest values
+		self.updateSlidersSlot(str(self.combo.currentText()))
+
 	# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
 	# Add tab contents
 
@@ -140,6 +139,7 @@ class ConfigWindow(QtGui.QWidget):
 		xpos = [20, 20, 210, 210]
 		ypos = [30, 60, 30, 60]
 
+
 		for i in range(len(self.thrusterLabels)):
 			self.thrustButtons.append(QtGui.QPushButton(self.thrusterLabels[i], self.thrusterGB))
 			self.thrustButtons[i].setGeometry(xpos[i], ypos[i], 120, 20)
@@ -148,8 +148,19 @@ class ConfigWindow(QtGui.QWidget):
 		xpos = [150, 150, 340, 340]
 		ypos = [30, 60, 30, 60]
 
+		# Try to get Thruster map
+		try:
+			thSettings = self.config[str(self.combo.currentText())]['ThMap']
+			thSettings = thSettings.split()
+		except:
+			print ("Error")
+
 		for i in range(len(xpos)):
-			self.thrustFields.append(QtGui.QLabel('____', self.thrusterGB))
+			try:
+				self.thrustFields.append(QtGui.QLabel(thSettings[i], self.thrusterGB))
+			except:
+				self.thrustFields.append(QtGui.QLabel('', self.thrusterGB))
+			
 			self.thrustFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.thrustFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setThrusterField)
 
@@ -175,6 +186,55 @@ class ConfigWindow(QtGui.QWidget):
 		for i in range (len(self.control.controllerNames)):
 			self.combo.addItem(str(self.control.controllerNames[i]))
 
+		self.combo.activated[str].connect(self.updateThrustGB)
+		self.combo.activated[str].connect(self.updateManipGB)
+		self.combo.activated[str].connect(self.updateSlidersSlot)
+
+	def updateThrustGB(self, text):
+
+		# Try to get Thruster map
+		try:
+			thSettings = self.config[text]['ThMap']
+			thSettings = thSettings.split()
+		except:
+			print ("Error")
+
+		for i in range(len(self.thrustFields)):
+			try:
+				self.thrustFields[i].setText(thSettings[i])
+			except:
+				self.thrustFields[i].setText('')
+
+
+	def updateManipGB(self, text):
+
+		# Try to get Thruster map
+		try:
+			manipSettings = self.config[text]['manipMap']
+			manipSettings = manipSettings.split()
+		except:
+			print ("Error")
+
+		for i in range(len(self.manipFields)):
+			try:
+				self.manipFields[i].setText(manipSettings[i])
+			except:
+				self.manipFields[i].setText('')
+
+	def updateSlidersSlot(self, text):
+
+		try:
+			self.dzSlider.setValue(int(self.config[text]['DEAD_ZONE']))
+			self.thLinSlider.setValue(int(self.config[text]['thLin']))
+			self.thExpSlider.setValue(int(self.config[text]['thExp']))
+			self.maLinSlider.setValue(int(self.config[text]['malin']))
+			self.maExpSlider.setValue(int(self.config[text]['maexp']))
+		except Exception:
+			print(sys.exc_info()[0])
+
+		# Update text
+		self.updateSliders()
+
 
 	def addManipulatorGBContents(self):
 		self.manipButtons = []
@@ -198,9 +258,19 @@ class ConfigWindow(QtGui.QWidget):
 
 		xpos = [150, 150, 150, 150, 340, 340]
 		ypos = [50, 80, 110, 140, 50, 80]
+
+		# Get current manip settings
+		try:
+			manipSettings = self.config[str(self.combo.currentText())]['manipMap']
+			manipSettings = manipSettings.split()
+		except:
+			print ("Error")
 		
 		for i in range(len(self.manipLabels)): 
-			self.manipFields.append(QtGui.QLabel('____', self.manipulatorGB))
+			try:
+				self.manipFields.append(QtGui.QLabel(manipSettings[i], self.manipulatorGB))
+			except:
+				self.manipFields.append(QtGui.QLabel('', self.manipulatorGB))
 			self.manipFields[i].setGeometry(xpos[i], ypos[i], 41, 20)
 			self.manipFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setManipField)
 		
@@ -232,7 +302,7 @@ class ConfigWindow(QtGui.QWidget):
 		ypos = [30, 60, 30, 60, 30, 60]
 		
 		for i in range(len(self.othersLabel)): 
-			self.othersFields.append(QtGui.QLabel('____', self.othersGB))
+			self.othersFields.append(QtGui.QLabel('', self.othersGB))
 			self.othersFields[i].setGeometry(xpos[i], ypos[i], 50, 20)
 			self.othersFields[i].connect(self.control, QtCore.SIGNAL('setText(QString)'), self.setOthersField)
 	
@@ -335,7 +405,6 @@ class ConfigWindow(QtGui.QWidget):
 		self.maLinSlider.actionTriggered.connect(self.updateSliders)
 		self.maExpSlider.actionTriggered.connect(self.updateSliders)
 
-	
 	# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	# Other functions:
 
@@ -402,22 +471,34 @@ class ConfigWindow(QtGui.QWidget):
 	def applyButtonHandler(self):
 		# This function saves settings to configfile
 		# Save to section with current name in comboBox
-		stringOut = ""
-		thrustOrMan = ""
+		thmap = ""
+		manipmap = ""
 		for i in range(len(self.thrusterLabels)):
-			stringOut += str(self.thrustFields[i].text()) + ","
+			thmap += str(self.thrustFields[i].text()) + " "
 
+		for i in range(len(self.manipLabels)):
+			manipmap += str(self.manipFields[i].text()) + " "
+
+		# Set slifer values
 
 		try:
-			self.config[str(self.combo.currentText())]['Map'] = stringOut
-		
-			if self.thrustRB.isChecked():
-				self.config[str(self.combo.currentText())]['Function'] = "Thruster"
-			elif self.manipRB.isChecked():
-				self.config[str(self.combo.currentText())]['Function'] = "Manip"
+			self.config[str(self.combo.currentText())]['ThMap'] = thmap
+			self.config[str(self.combo.currentText())]['manipMap'] = manipmap
+			
+			if(self.thLinButton.isChecked()):
+				self.config[str(self.combo.currentText())]['thLin'] = str(self.thLinSlider.value())
+				self.config[str(self.combo.currentText())]['thExp'] = '1'
 			else:
-				self.config[str(self.combo.currentText())]['Function'] = "Thruster"
-
+				self.config[str(self.combo.currentText())]['thLin'] = '1'
+				self.config[str(self.combo.currentText())]['thExp'] = str(self.thExpSlider.value())
+			if(self.maLinButton.isChecked()):
+				self.config[str(self.combo.currentText())]['maLin'] = str(self.maLinSlider.value())
+				self.config[str(self.combo.currentText())]['maExp'] = '1'
+			else:
+				self.config[str(self.combo.currentText())]['maLin'] = '1'
+				self.config[str(self.combo.currentText())]['maExp'] = str(self.maExpSlider.value())
+			
+			self.config[str(self.combo.currentText())]['DEAD_ZONE'] = str(self.dzSlider.value())
 		except KeyError:
 			print('knappefeil')
 
@@ -425,8 +506,6 @@ class ConfigWindow(QtGui.QWidget):
 			self.config.write(configfile)
 
 		self.aboutMB = openMsgBox.Apply()
-
-	
 
 	def resetButtonHandler(self):
 		# first, open "are-you-sure" window		
@@ -478,17 +557,3 @@ class ConfigWindow(QtGui.QWidget):
 		self.maLinSliderValue.setText(str(self.maLinSlider.value()))
 		self.maExpSliderValue.setText(str(self.maExpSlider.value()))
 		self.dzSliderValue.setText(str(self.dzSlider.value()))
-		
-################################################################################
-#   MAIN
-################################################################################
-
-def main():
-	app = QtGui.QApplication(sys.argv)
-	ex = ConfigWindow()
-	sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-	main()
-
