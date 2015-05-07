@@ -100,37 +100,6 @@ class ConfigWindow(QtGui.QWidget):
 		self.othersGB = QtGui.QGroupBox("ON/OFF functions", self.keyBindingsTab)
 		self.othersGB.setGeometry(20, 380, self.w - 89, 92)
 		self.addOthersGBContents()
-
-		# Add radiobuttons:
-		lbl = QtGui.QLabel('Set controller function:', self.keyBindingsTab)
-		lbl.setGeometry(442, 15, 200, 20)
-		self.thrustRB = QtGui.QRadioButton('Thrusters', self.keyBindingsTab)
-		self.thrustRB.move(442, 37)
-		self.manipRB = QtGui.QRadioButton('Manipulator', self.keyBindingsTab)
-		self.manipRB.move(442, 60)
-		
-		num = len(self.control.controllerNames) # hent len(listOfControllers)
-		if (num < 1):
-			self.activateManipButtons(False)
-			self.activateThrustButtons(False)
-			self.activateOtherButtons(False)
-			self.thrustRB.setEnabled(False)
-			self.manipRB.setEnabled(False)
-		elif (num == 1):	
-			# nå: én kontroller kan styre alt, evnt: én kontroller kan kun enten styre thrust eller manip
-			self.activateManipButtons(True)
-			self.activateThrustButtons(True)
-			self.activateOtherButtons(True)
-			self.thrustRB.setEnabled(False)
-			self.manipRB.setEnabled(False)
-		elif (num > 1):
-			self.thrustRB.setEnabled(True)
-			self.manipRB.setEnabled(True)
-			self.thrustRB.setChecked(True)
-			self.activateThrustButtons(True)
-			self.activateManipButtons(False)
-			self.thrustRB.toggled.connect(self.thrustToggled)
-			self.manipRB.toggled.connect(self.manipToggled)
 			
 
 
@@ -395,29 +364,6 @@ class ConfigWindow(QtGui.QWidget):
 			if self.othersButtons[i].isChecked():
 				self.othersFields[i].setText(axis)
 				self.othersButtons[i].setChecked(False)
-
-	def activateThrustButtons(self, bool):
-		for i in range(len(self.thrustButtons)):
-			self.thrustButtons[i].setEnabled(bool)
-
-	def activateManipButtons(self, bool):
-		for i in range(len(self.manipButtons)):
-			self.manipButtons[i].setEnabled(bool)
-
-	def activateOtherButtons(self, bool):
-		for i in range(len(self.othersButtons)):
-			self.othersButtons[i].setEnabled(bool)
-
-	def thrustToggled(self):
-		self.activateThrustButtons(True)
-		self.activateManipButtons(False)
-		self.activateOtherButtons(True)
-
-	def manipToggled(self):
-		self.activateThrustButtons(False)
-		self.activateManipButtons(True)
-		self.activateOtherButtons(True)
-
 
 
 		
