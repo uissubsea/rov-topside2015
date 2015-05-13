@@ -35,8 +35,6 @@ class NetworkClient(QtCore.QThread):
 	def __init__(self):
 		super(NetworkClient, self).__init__()
 
-		self.mutex = QtCore.QMutex
-
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 		self.config = configparser.ConfigParser()
@@ -44,7 +42,7 @@ class NetworkClient(QtCore.QThread):
 
 		self.rov_data = ["0","0","0","0","0"]
 
-		self.receiver = Receiver()
+		#self.receiver = Receiver()
 
 		self.useManip = False
 		self.useThrust = False
@@ -134,51 +132,6 @@ class NetworkClient(QtCore.QThread):
 			logger.error(string)
 		elif logType == "info":
 			logger.info(string)
-		
-
-class Receiver(QtCore.QThread):
-	def __init__(self, address="192.168.1.20", port=50001):
-		super(Receiver, self).__init__()
-
-		self.mutex = QtCore.QMutex
-
-		self.rsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.server_address = (address, port)
-
-	def run(self):
-		# This thread will connect to the ROV and wait for data to arrive
-
-		self.connected = False
-
-		while not self.connected:
-			try:
-				self.rsocket.connect(self.server_address)
-				self.connected = True
-				print("Receiver Connected")
-			except socket.error as msg:
-				# Log error
-				time.sleep(2)
-				print("Receiver thread unable to connect, trying again in 2 seconds")
-
-		while(True):
-			self.receivedData = self.rsocket.recv(128)
-			
-			#self.receivedString = parseData(self.receivedData)
-
-			print(self.receivedData)
-
-			#if self.receivedString == "Manip":
-				# Update Manipulator widget
-
-			#elif self.receivedString == "Th":
-				# Update Thruster widget
-			#elif self.receivedString == "adc":
-				# update temp, power etc
-
-	def parseData(self, stringtoparse):
-		output = stringtoparse
-		#output.split("_")
-		#print(output)
 			
 
 
