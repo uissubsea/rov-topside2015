@@ -68,3 +68,5 @@ class Pod1Status(QtGui.QWidget):
 			self.powerValue.setGeometry(120, 80, 80, 20)
 			self.mcPower.append(self.powerValue)
 
+	def updateTemp(self, string):
+		self.tempValue.setText(string)

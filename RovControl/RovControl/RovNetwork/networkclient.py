@@ -31,6 +31,8 @@ class NetworkClient(QtCore.QThread):
 	
 	# Signal to update statusWindow
 	updateStatus = QtCore.pyqtSignal()
+	updateThWidget = QtCore.pyqtSignal(str)
+	updateManipWidget = QtCore.pyqtSignal(str)
 
 	def __init__(self):
 		super(NetworkClient, self).__init__()
@@ -58,12 +60,14 @@ class NetworkClient(QtCore.QThread):
 		# Start controller thread
 		self.control.start()
 
+		# Start Receiver Thread
+		#self.receiver.start()
+
+		time.sleep(1)
+
 		while self.connected:
 			while self.running:	
 
-				# Start Receiver Thread
-				#self.receiver.start()
-			
 				# Process controller and get newest data
 				self.control.process_controller()
 
@@ -77,11 +81,17 @@ class NetworkClient(QtCore.QThread):
 
 					# Receive Data from ROV and log
 
-					self.data = self.sock.recv(128)
+					self.data = str(self.sock.recv(128))
 					#self.parse_data(self.data.decode("UTF-8"))
 
-					print(self.data, "\r", end="")
+					#print(self.data, "\r", end="")
 
+					self.data = self.data.split(";")
+
+					self.updateThWidget.emit(self.data[0])
+					
+					if len(self.data) > 1:
+						self.updateManipWidget.emit(self.data[1])
 				
 				time.sleep(0.05)
 			time.sleep(5)

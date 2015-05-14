@@ -9,7 +9,7 @@ from PyQt4 import QtGui, QtCore
 from Gui import mainwindow, settingswindow, statuswindow, pod1, pod2, cntrconfig2
 from Gui import testWindow, manipulatorwidget, thrusterwidget, depthsensor
 from Gui import camerawindow, about#, openMsgBox
-from RovNetwork import networkclient
+from RovNetwork import networkclient, receiver
 
 ##############################################################################
 
@@ -65,6 +65,10 @@ class MainWidget(QtGui.QMainWindow):
         # Network Client Thread
         self.netClient = networkclient.NetworkClient()
 
+        # Receiver Thread
+        self.receiverClient = receiver.Receiver()
+
+        #Connect signals
         self.netClient.updateStatus.connect(self.update_statusWindow)
 
         # Create Status window for later use
@@ -147,17 +151,25 @@ class MainWidget(QtGui.QMainWindow):
         self.ui.mdiArea.addSubWindow(self.subwindow9)
         self.pod1Window.show()
 
+        # Connect signal to update temp
+        self.receiverClient.updateTemp.connect(self.pod1Window.updateTemp)
+
     def open_pod2(self):
         self.pod2Window = pod2.Pod2Status()
         self.subwindow10.setWidget(self.pod2Window)
         self.ui.mdiArea.addSubWindow(self.subwindow10)
         self.pod2Window.show()
 
+         # Connect signal to update temp
+        self.receiverClient.updateTemp.connect(self.pod2Window.updateTemp)
+
     def open_manipulatorWidget(self):
         self.maniWindow = manipulatorwidget.ManipulatorWidget()
         self.subwindow11.setWidget(self.maniWindow)
         self.ui.mdiArea.addSubWindow(self.subwindow11)
-        self.maniWindow.show()   
+        self.maniWindow.show()  
+
+        self.netClient.updateManipWidget.connect(self.maniWindow.updateData) 
 
     def open_thrusterWidget(self):
         self.thrWindow = thrusterwidget.ThrusterWidget()
@@ -165,6 +177,8 @@ class MainWidget(QtGui.QMainWindow):
         # Add subwindow to mdiArea:
         self.ui.mdiArea.addSubWindow(self.subwindow12)
         self.thrWindow.show()
+
+        self.netClient.updateThWidget.connect(self.thrWindow.updateData)
 
     def open_depthWidget(self):
         self.depthWindow = depthsensor.DepthWidget()
@@ -175,7 +189,7 @@ class MainWidget(QtGui.QMainWindow):
     def connect(self):
         #Start Network Client
         self.netClient.start()
-
+        self.receiverClient.start()
         self.netClient.running = True
         self.open_statusWindow()
         #self.netClient.connect()

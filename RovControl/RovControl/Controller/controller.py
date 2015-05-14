@@ -294,6 +294,8 @@ class Controller(QtCore.QThread):
 					#Use exponential
 					valueManip = int(valueManip*0.02*math.pow(self.manipExpValue[i],3))
 
+				if j == 4 or j == 5:
+					valueManip = valueManip + 65
 				self.manipData[j] = valueManip
 
 

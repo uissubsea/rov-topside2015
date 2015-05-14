@@ -7,6 +7,7 @@ Elisabeth - UiS Subsea 2015
 '''
 
 import sys
+import re
 from PyQt4 import QtGui, QtCore
 from Controller import controller
 
@@ -27,6 +28,7 @@ class ManipulatorWidget(QtGui.QWidget):
 		self.m3 = 0
 		self.m4 = 0
 		self.m5 = 0
+		self.m6 = 0
 
 		# Init. UI:
 		self.initUI()
@@ -49,9 +51,10 @@ class ManipulatorWidget(QtGui.QWidget):
 		
 		self.drawManipulator(qp)
 		self.drawProcessBars(qp)
+		self.updateProcessBars()
 
 		qp.end()
-		self.updateData()
+		#self.updateData()
 	
 
 	def addGraphics(self):
@@ -75,19 +78,17 @@ class ManipulatorWidget(QtGui.QWidget):
 			self.label.setGeometry(xpos[i], ypos[i], 70, 20)
 
 
-	def updateData(self):
-		
-		'''
-		self.m1 = self.axis_data[0]
-		self.m2 = self.axis_data[1]
-		self.m3 = self.axis_data[2]
-		self.m4 = self.axis_data[3]
-		self.m5 = self.axis_data[4]
-		'''
-		
+	def updateData(self, string):
 
-		# Re-draw process bars:
-		self.updateProcessBars()
+		self.manipData = re.findall(r'-?\d+', string)
+
+		self.m1 = int(int(self.manipData[0])*30/100)
+		self.m2 = int(int(self.manipData[1])*30/100)
+		self.m3 = int(int(self.manipData[2])*30/100)
+		self.m4 = int(int(self.manipData[3])*30/100)
+		self.m5 = int(int(self.manipData[4])*15/100)
+		self.m6 = int(int(self.manipData[5])*(-15)/100)
+
 		self.update() # Default function: calls QPaintEvent
 
 
@@ -149,6 +150,7 @@ class ManipulatorWidget(QtGui.QWidget):
 		qp.drawRect(230, 123, 20, self.m4)
 		# Open/close claw
 		qp.drawRect(330, 126, 20, self.m5)
+		qp.drawRect(330, 126, 20, self.m6)
 		
 		qp.end()
 

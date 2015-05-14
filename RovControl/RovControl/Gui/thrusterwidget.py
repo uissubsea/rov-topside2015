@@ -6,17 +6,21 @@ Elisabeth - UiS Subsea 2015
 '''
 
 import sys
+import re
+import math
 from PyQt4 import QtGui, QtCore
 
+# Define colors:
+GREEN = QtGui.QColor(150,226,0)
+DARKGRAY = QtGui.QColor(90, 90, 90)
+LIGHTGRAY = QtGui.QColor(115, 115, 115)
+YELLOW = QtGui.QColor(238, 194, 0)
 
 class ThrusterWidget(QtGui.QWidget):
 
+
 	def __init__(self):
 		super(ThrusterWidget, self).__init__()
-
-		# Init. controller:
-		#self.controller = js.Controller()
-		#self.controller.open_controller(0)
 		
 		# Init. th-values:
 		self.th1 = 0
@@ -40,6 +44,7 @@ class ThrusterWidget(QtGui.QWidget):
 		#self.center()
 		self.setWindowTitle('Thruster status')
 		self.addPropellers()
+
 		#self.show()
 
 
@@ -49,12 +54,12 @@ class ThrusterWidget(QtGui.QWidget):
 		qp.begin(self)
 
 		self.drawFixedObjects(qp)
+		self.updateProcessBars(qp)
 		qp.rotate(45) # Rotates coordinate syst. 45 deg (cw)
 		self.drawFixedTiltedObjects(qp)
-		#qp.rotate(-45) # Rot. back to default
+		self.updateTiltedProcessBars(qp)
+		qp.rotate(-45) # Rot. back to default
 		qp.end()
-
-		self.updateData()
 
 
 	def addPropellers(self):
@@ -69,33 +74,36 @@ class ThrusterWidget(QtGui.QWidget):
 			self.prop.setPixmap(propimg)
 
 
-	def updateData(self):
+	def updateData(self, string):
 		
+		self.thData = re.findall(r'-?\d+', string)
+
+		self.x = int(int(self.thData[0])*30/1000)
+		self.y = int(int(self.thData[1])*30/1000)
+		self.z = int(int(self.thData[2])*30/1000)
+		self.rot = int(int(self.thData[3])*30/1000)
+
+		self.r = math.sqrt(abs(pow(self.x, 2)) + abs(pow(self.y, 2)))
+		
+		self.theta = math.atan2(self.x, self.y)
+
+		self.scale = 1;
 		# Read controller values:
-		#self.th1 = self.controller.get_button_state(3)*30
-		#self.th2 = self.controller.get_button_state(1)*30
-		#self.th3 = self.controller.get_button_state(0)*30
-		#self.th4 = self.controller.get_button_state(2)*30
-		#self.th5 = self.controller.read_axis(0,1000)
-		#self.th6 = self.controller.read_axis(1,1000)
-		#self.th7 = self.controller.read_axis(3,1000)
-		#self.th8 = self.controller.read_axis(4,1000)
+		self.th1 = int(self.r * math.cos(math.pi/4 - self.theta) * self.scale)
+		self.th2 = int(self.r * math.cos(math.pi/4 - self.theta) * self.scale)
+		self.th3 = self.th1 * -1
+		self.th4 = self.th2 * -1
+		self.th5 = int(self.thData[2])
+		self.th6 = int(self.thData[2])
+		self.th7 = int(self.thData[2])
+		self.th8 = int(self.thData[2])
 		# OBS! Thrusterverdier skal hentes direkte fra motorpådrag!
 
-		#th_array = [th1, th2, th3, th4, th5, th6, th7, th8]
-		#print(th_array)
-
 		# Re-draw process bars:
-		self.updateProcessBars()
-		self.updateTiltedProcessBars()
 		self.update()
-
 		
 	def drawFixedObjects(self, qp):
-		# Define colors:
-		DARKGRAY = QtGui.QColor(90, 90, 90)
-		LIGHTGRAY = QtGui.QColor(115, 115, 115)
-		YELLOW = QtGui.QColor(238, 194, 0)
+
 
 		# Draw frames:
 		qp.setBrush(YELLOW)
@@ -123,16 +131,8 @@ class ThrusterWidget(QtGui.QWidget):
 		qp.drawRect(218, -145, 60, 20)
 
 
-	def updateProcessBars(self):
-		# Init. glob.vars:
-		global th5, th6, th7, th8
+	def updateProcessBars(self, qp):
 
-		# Define colors:
-		GREEN = QtGui.QColor(150,226,0)
-
-		# Init. QPainter:
-		qp = QtGui.QPainter()
-		qp.begin(self)
 		qp.setBrush(GREEN)
 
 		# Thruster no. 5
@@ -144,16 +144,8 @@ class ThrusterWidget(QtGui.QWidget):
 		# Thruster no. 8
 		qp.drawRect(198, 270, 20, self.th8) # siste: +/- 30
 
-		# Close QPainter:
-		qp.end()
 
-
-	def updateTiltedProcessBars(self):
-
-		# Init. QPainter:
-		qp = QtGui.QPainter()
-		qp.begin(self)
-		qp.rotate(45)
+	def updateTiltedProcessBars(self, qp):
 
 		# Define colors:
 		GREEN = QtGui.QColor(150,226,0)
@@ -170,9 +162,6 @@ class ThrusterWidget(QtGui.QWidget):
 		# Thruster no. 4
 		qp.drawRect(410, 35, 20, self.th4) # siste: +/- 30
 
-		# Close QPainter:
-		#qp.rotate(-45)
-		qp.end()
 
 
 	def center(self):
