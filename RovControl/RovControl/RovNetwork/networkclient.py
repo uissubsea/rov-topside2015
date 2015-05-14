@@ -137,12 +137,9 @@ class NetworkClient(QtCore.QThread):
 
 
 	def log(self, string, logType):
-		self.updateStatus.emit()
 		if logType == "error":
 			logger.error(string)
 		elif logType == "info":
 			logger.info(string)
-			
-
-
-
+	
+		self.updateStatus.emit()

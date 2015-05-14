@@ -7,7 +7,7 @@ sys.path.insert(1, "../RovControl")
 
 from PyQt4 import QtGui, QtCore
 from Gui import mainwindow, settingswindow, statuswindow, pod1, pod2, cntrconfig2
-from Gui import testWindow, manipulatorwidget, thrusterwidget, depthsensor
+from Gui import testWindow, manipulatorwidget, thrusterwidget, rovdata
 from Gui import camerawindow, about#, openMsgBox
 from RovNetwork import networkclient, receiver
 
@@ -22,7 +22,7 @@ class MainWidget(QtGui.QMainWindow):
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
 
-       # Make some local modifications.
+        # Make some local modifications.
 
         # Connect menu buttons:
         #   --> on-top widgets:
@@ -39,7 +39,7 @@ class MainWidget(QtGui.QMainWindow):
         self.ui.actionPOD_2.triggered.connect(self.open_pod2)
         self.ui.actionManipulator.triggered.connect(self.open_manipulatorWidget)
         self.ui.actionThursters.triggered.connect(self.open_thrusterWidget)
-        self.ui.actionDepth_sensor.triggered.connect(self.open_depthWidget)
+        self.ui.actionVehicleData.triggered.connect(self.open_dataWidget)
         
         self.ui.actionExit.triggered.connect(self.exit)
 
@@ -48,6 +48,7 @@ class MainWidget(QtGui.QMainWindow):
 
         self.show()
 
+        # Init. subwindows:
         self.subwindow1 = QtGui.QMdiSubWindow()
         self.subwindow2 = QtGui.QMdiSubWindow()
         self.subwindow3 = QtGui.QMdiSubWindow()
@@ -178,13 +179,14 @@ class MainWidget(QtGui.QMainWindow):
         self.ui.mdiArea.addSubWindow(self.subwindow12)
         self.thrWindow.show()
 
+
         self.netClient.updateThWidget.connect(self.thrWindow.updateData)
 
-    def open_depthWidget(self):
-        self.depthWindow = depthsensor.DepthWidget()
-        self.subwindow13.setWidget(self.depthWindow)
+    def open_dataWidget(self):
+        self.dataWindow = rovdata.RovData()
+        self.subwindow13.setWidget(self.dataWindow)
         self.ui.mdiArea.addSubWindow(self.subwindow13)
-        self.depthWindow.show()
+        self.dataWindow.show()
 
     def connect(self):
         #Start Network Client

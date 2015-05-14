@@ -19,9 +19,6 @@ class UiSSubsea(QtGui.QWidget):
 
 
 	def addContents(self):
-		lbl = QtGui.QLabel('legg til litt fornuftig tekst om uis subsea', self)
-		lbl.setGeometry(30,40,300,300)
-
 		w = 300*0.7
 		h = 252*0.7
 		img = QtGui.QLabel(self)
@@ -29,6 +26,12 @@ class UiSSubsea(QtGui.QWidget):
 		img.setGeometry((self.w/2)-(w/2),20,w,h)
 		logo = QtGui.QPixmap('Gui/RESOURCES/subsea_logo.png')
 		img.setPixmap(logo)
+
+		lbl = QtGui.QLabel('Student organization building self-made ROVs.\n'
+						'Located at the University of Stavanger, Norway.\n'
+						'Established in 2014\n', self)
+				
+		lbl.setGeometry(115,100,300,300)
 
 		self.addButtons()
 
@@ -62,8 +65,8 @@ class Vehicle(QtGui.QWidget):
 
 	def initUI(self):
 		# Draw widget window:
-		self.w = 550
-		self.h = 200
+		self.w = 960*0.4
+		self.h = 696*0.4
 		self.center()
 		self.setMaximumSize (self.w, self.h)
 		self.setMinimumSize(self.w, self.h)
@@ -72,8 +75,18 @@ class Vehicle(QtGui.QWidget):
 
 
 	def addContents(self):
-		text = QtGui.QLabel('Name: not set\nSoftware version: 1.0', self)
-		text.setGeometry(20,40,200,50)
+		w = 960*0.37
+		h = 696*0.37
+		img = QtGui.QLabel(self)
+		img.setScaledContents(True)
+		img.setGeometry((self.w/2)-(w/2),10,w,h)
+		logo = QtGui.QPixmap('Gui/RESOURCES/holydiver.jpg')
+		img.setPixmap(logo)
+
+		#text = QtGui.QLabel('Name: Holy Diver\n'
+							#'Software: v1.0\n'
+							#'...\n', self)
+		#text.setGeometry(10,10,200,200)
 
 		self.addButtons()
 

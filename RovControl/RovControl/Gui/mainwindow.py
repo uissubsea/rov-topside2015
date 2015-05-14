@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'RESOURCES/MainWindow.ui'
 #
-# Created: Thu May  7 15:06:50 2015
+# Created: Wed May 13 18:20:15 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -75,8 +75,8 @@ class Ui_MainWindow(object):
         self.actionManipulator.setObjectName(_fromUtf8("actionManipulator"))
         self.actionThursters = QtGui.QAction(MainWindow)
         self.actionThursters.setObjectName(_fromUtf8("actionThursters"))
-        self.actionDepth_sensor = QtGui.QAction(MainWindow)
-        self.actionDepth_sensor.setObjectName(_fromUtf8("actionDepth_sensor"))
+        self.actionVehicleData = QtGui.QAction(MainWindow)
+        self.actionVehicleData.setObjectName(_fromUtf8("actionVehicleData"))
         self.actionAboutUs = QtGui.QAction(MainWindow)
         self.actionAboutUs.setObjectName(_fromUtf8("actionAboutUs"))
         self.actionAboutVehicle = QtGui.QAction(MainWindow)
@@ -102,7 +102,7 @@ class Ui_MainWindow(object):
         self.menuView.addSeparator()
         self.menuView.addAction(self.actionManipulator)
         self.menuView.addAction(self.actionThursters)
-        self.menuView.addAction(self.actionDepth_sensor)
+        self.menuView.addAction(self.actionVehicleData)
         self.menuView.addSeparator()
         self.menuView.addAction(self.actionStatus)
         self.menuSettings.addAction(self.actionController)
@@ -119,7 +119,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "RovControl v1.0b", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "RovControl v 0.1a", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuAbout.setTitle(_translate("MainWindow", "About", None))
         self.menuView.setTitle(_translate("MainWindow", "View", None))
@@ -138,9 +138,9 @@ class Ui_MainWindow(object):
         self.actionCamera_3.setText(_translate("MainWindow", "Camera 3", None))
         self.actionManipulator.setText(_translate("MainWindow", "Manipulator", None))
         self.actionThursters.setText(_translate("MainWindow", "Thursters", None))
-        self.actionDepth_sensor.setText(_translate("MainWindow", "Depth sensor", None))
+        self.actionVehicleData.setText(_translate("MainWindow", "Vehicle data", None))
         self.actionAboutUs.setText(_translate("MainWindow", "UiS Subsea", None))
-        self.actionAboutVehicle.setText(_translate("MainWindow", "Empty", None))
+        self.actionAboutVehicle.setText(_translate("MainWindow", "ROV v.1.0", None))
         self.actionOption.setText(_translate("MainWindow", "Options", None))
         self.actionConnect.setText(_translate("MainWindow", "Connect", None))
         self.actionDisconnect.setText(_translate("MainWindow", "Disconnect", None))

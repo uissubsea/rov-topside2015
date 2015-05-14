@@ -58,7 +58,7 @@
     <addaction name="separator"/>
     <addaction name="actionManipulator"/>
     <addaction name="actionThursters"/>
-    <addaction name="actionDepth_sensor"/>
+    <addaction name="actionVehicleData"/>
     <addaction name="separator"/>
     <addaction name="actionStatus"/>
    </widget>
@@ -150,9 +150,9 @@
     <string>Thursters</string>
    </property>
   </action>
-  <action name="actionDepth_sensor">
+  <action name="actionVehicleData">
    <property name="text">
-    <string>Depth sensor</string>
+    <string>Vehicle data</string>
    </property>
   </action>
   <action name="actionAboutUs">
