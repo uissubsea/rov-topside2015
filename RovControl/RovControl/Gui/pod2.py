@@ -14,13 +14,6 @@ class Pod2Status(QtGui.QWidget):
 
 		self.addContents()
 
-		# Remove when connected to incomming signals:
-		u = [1, 2, 3, 4, 5, 6, 7, 8]
-		i = [10, 20, 30, 40, 50, 60, 70, 80]
-		p = [0, 0, 0, 0, 0, 0, 0, 0]
-		self.update(u, i, p, 8, 'OK')
-
-
 	def addContents(self):
 		self.sensorGB = QtGui.QGroupBox('Sensors', self)
 		self.sensorGB.setGeometry(15, 10, 340, 65)
@@ -131,15 +124,6 @@ class Pod2Status(QtGui.QWidget):
 			self.powerLbl = QtGui.QLabel('Power [W]:', self.mcGB[i])
 			self.powerLbl.setGeometry(14, 80, 100, 20)
 			self.powerValue[i].setGeometry(120, 80, 80, 20)
-
-
-	def update(self, voltage, current, power, temp, hydro):
-		for i in range(8):
-			self.voltageValue[i].setText(str(voltage[i]))
-			self.currentValue[i].setText(str(current[i]))
-			self.powerValue[i].setText(str(power[i]))
-			self.tempValue.setText(str(temp) +  ' °C')
-			self.hydrStatus.setText(hydro)
 
 	def updateTemp(self, string):
 		self.tempValue.setText(string)
