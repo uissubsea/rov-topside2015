@@ -12,8 +12,7 @@ class Pod1Status(QtGui.QWidget):
 		self.setWindowTitle('POD 1 - Manip. MCs')
 		self.mainGrid = QtGui.QGridLayout(self)
 
-		self.addSensorData()
-		self.addMCData()
+		self.addContents()
 
 		# Remove when connected to incomming signals:
 		u = [1, 2, 3, 4, 5]
@@ -22,7 +21,7 @@ class Pod1Status(QtGui.QWidget):
 		self.update(u, i, p, 8, 'OK')
 
 
-	def addSensorData(self):
+	def addContents(self):
 		self.sensorGB = QtGui.QGroupBox('Sensors', self)
 		self.sensorGB.setGeometry(15, 10, 340, 65)
 
@@ -37,10 +36,6 @@ class Pod1Status(QtGui.QWidget):
 		self.hydrStatus.setGeometry(300, 30, 80, 20)
 
 
-	# To access or edit voltage, current and/or power data:
-	# call the array with index = mc no. - 1, for instance for
-	# mc 1, call self.mcVoltage[0]
-	def addMCData(self):
 		self.mcVoltage = []
 		self.mcCurrent = []
 		self.mcPower = []
