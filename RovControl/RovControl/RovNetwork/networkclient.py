@@ -129,12 +129,13 @@ class NetworkClient(QtCore.QThread):
 
 
 	def log(self, string, logType):
-		self.updateStatus.emit()
 		if logType == "error":
 			logger.error(string)
 		elif logType == "info":
 			logger.info(string)
-		
+	
+		self.updateStatus.emit()
+
 
 class Receiver(QtCore.QThread):
 	def __init__(self, address="192.168.1.20", port=50001):
