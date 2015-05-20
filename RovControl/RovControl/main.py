@@ -194,7 +194,6 @@ class MainWidget(QtGui.QMainWindow):
         self.receiverClient.start()
         self.netClient.running = True
         self.open_statusWindow()
-        #self.netClient.connect()
 
     def disconnect(self):
         # Stop Network client
@@ -202,7 +201,6 @@ class MainWidget(QtGui.QMainWindow):
 
     def exit(self):
         # Stop Network client
-        #self.netClient.disconnect()
         self.close()
         print("Stopped?")
         sys.exit()

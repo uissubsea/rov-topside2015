@@ -78,7 +78,7 @@ class Controller(QtCore.QThread):
 
 		# Try to open Controllers
 		for i in range(sdl2.SDL_NumJoysticks()):
-			self.open_controller(i)
+			self.openController(i)
 		
 		self.configController()
 
@@ -90,7 +90,7 @@ class Controller(QtCore.QThread):
 				self.events = sdl2.ext.get_events()
 				self.changed = False
 				for event in self.events:
-					self.handle_events(event)
+					self.handleEvents(event)
 				#self.changed = False
 				#print(self.axisData)
 
@@ -104,7 +104,7 @@ class Controller(QtCore.QThread):
 				self.events = sdl2.ext.get_events()
 				self.changed = False
 				for event in self.events:
-					self.handle_SettingEvents(event)
+					self.handleSettingEvents(event)
 				#self.changed = False
 				#print(self.ctrl_axisdata)
 
@@ -113,13 +113,7 @@ class Controller(QtCore.QThread):
 			self.closeController()
 
 
-	def handle_events(self, event):
-		# If Controller Event
-
-		#if event.type == sdl2.SDL_JOYDEVICEADDED:
-		#	# Open connected joystick
-		#	self.open_controller()
-		#	print("SDL_JOYDEVICEADDED")
+	def handleEvents(self, event):
 
 		if event.type == sdl2.SDL_JOYAXISMOTION:
 			self.changed = True
@@ -128,12 +122,7 @@ class Controller(QtCore.QThread):
 					for j in range(self.controllerNumAxis[i]): 
 				
 						if event.jaxis.axis == j:
-							value = int(event.jaxis.value)
-							if j == 1:
-								value = value *-1							
-							# Left- right movement (x)
-							#if event.jaxis.axis == 2:
-							#	value = value + 670
+							value = int(event.jaxis.value)						
 							
 							if (value > -self.controllerDeadZone[i]*50 and value < self.controllerDeadZone[i]*50):
 								#Inside Dead zone
@@ -160,14 +149,7 @@ class Controller(QtCore.QThread):
 							#self.running = False
 		# Other Events
 
-	def handle_SettingEvents(self, event):
-		
-		# If Controller Event
-
-		#if event.type == sdl2.SDL_JOYDEVICEADDED:
-		#	# Open connected joystick
-		#	self.open_controller()
-		#	print("SDL_JOYDEVICEADDED")
+	def handleSettingEvents(self, event):
 
 		if event.type == sdl2.SDL_JOYAXISMOTION:
 			self.changed = True
@@ -177,9 +159,6 @@ class Controller(QtCore.QThread):
 				
 						if event.jaxis.axis == j:
 							value = int(event.jaxis.value)
-							# Left- right movement (x)
-							#if event.jaxis.axis == 2:
-							#	value = value + 670
 
 							if (value < -5000):
 								value = value + self.controllerDeadZone[i]
@@ -198,13 +177,11 @@ class Controller(QtCore.QThread):
 					for j in range(self.controllerNumButtons[i]):
 						if event.jbutton.button == j:
 							self.emit(QtCore.SIGNAL('setText(QString)'), "Btn" + str(j))
-							#print("Key pressed")
-							#self.running = False
 		# Other Events
 
 
 
-	def open_controller(self, index = None):
+	def openController(self, index = None):
 		
 		self.num_ctrl = sdl2.SDL_NumJoysticks()
 		
@@ -272,23 +249,21 @@ class Controller(QtCore.QThread):
 			self.manipExpValue[i] = int(self.manipExpValue[i])
 
 
-	def process_controller(self):
+	def processController(self):
 		
 		for i in range(len(self.axisData)):
 			for j in range(len(self.thrusterMap[i])):
 				valueTh = self.axisData[i][self.thrusterMap[i][j]]
-				if(self.ThLinValue[i] > 1):
+				if(self.ThLinValue[i] > 0):
 					valueTh = int(valueTh/self.ThLinValue[i])
 				else:
 					#Use exponential
 					valueTh = int(valueTh*0.02*math.pow(self.thExpvalue[i],3))
-				#if j == 0 or j == 2:
-				#	self.thData[j] = value * -1
-				#else:
+
 				self.thData[j] = valueTh
 			for j in range(len(self.manipMap[i])):
 				valueManip = self.axisData[i][self.manipMap[i][j]]
-				if(self.manipLinValue[i] > 1):
+				if(self.manipLinValue[i] > 0):
 					valueManip = int(valueManip/self.manipLinValue[i])
 				else:
 					#Use exponential

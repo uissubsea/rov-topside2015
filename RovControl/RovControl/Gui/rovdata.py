@@ -100,8 +100,6 @@ class RovData(QtGui.QWidget):
 		#mekk så widgeten oppdaterer seg!
 
 
-
-
 # For testing:
 def main():
 	app = QtGui.QApplication(sys.argv)

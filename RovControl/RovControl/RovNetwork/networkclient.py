@@ -69,25 +69,21 @@ class NetworkClient(QtCore.QThread):
 			while self.running:	
 
 				# Process controller and get newest data
-				self.control.process_controller()
+				self.control.processController()
 
 				# Only send data if controller status changed
 				if (self.control.changed):
 
 					self.str = self.serialize(self.control.thData, self.control.manipData)
 
-					#print(self.str)
 					self.sock.sendall(bytes(self.str, 'UTF-8'))
 
-					# Receive Data from ROV and log
-
+					# Receive Data from ROV
 					self.data = str(self.sock.recv(128))
-					#self.parse_data(self.data.decode("UTF-8"))
-
-					#print(self.data, "\r", end="")
 
 					self.data = self.data.split(";")
 
+					# Send signal to update Thrust and manip
 					self.updateThWidget.emit(self.data[0])
 					
 					if len(self.data) > 1:
