@@ -300,8 +300,8 @@ class Controller(QtCore.QThread):
 		self.config[str(self.controllerNames[-1])]['btnMap'] = ''
 
 		# Add exp and lin values
-		self.config[str(self.controllerNames[-1])]['thLin'] = ''
-		self.config[str(self.controllerNames[-1])]['maLin'] = ''
+		self.config[str(self.controllerNames[-1])]['thLin'] = '10'
+		self.config[str(self.controllerNames[-1])]['maLin'] = '10'
 		self.config[str(self.controllerNames[-1])]['thExp'] = ''
 		self.config[str(self.controllerNames[-1])]['maExp'] = ''
 

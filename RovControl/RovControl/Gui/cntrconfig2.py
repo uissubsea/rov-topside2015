@@ -476,6 +476,7 @@ class ConfigWindow(QtGui.QWidget):
 
 	def cancelButtonHandler(self):
 		self.control.running = False
+		self.control = None
 		self.close()
 
 

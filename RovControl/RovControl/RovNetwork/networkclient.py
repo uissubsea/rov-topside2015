@@ -55,11 +55,6 @@ class NetworkClient(QtCore.QThread):
 	def run(self):
 		self.connect()
 
-		# Start controller thread
-		self.control = controller.Controller()
-		# Start controller thread
-		self.control.start()
-
 		# Start Receiver Thread
 		#self.receiver.start()
 
@@ -105,13 +100,20 @@ class NetworkClient(QtCore.QThread):
 
 	def disconnect(self):
 		self.running = False
+		self.control.running = False
+		self.control = None
 		# Disconnect from server
 		self.sock.close()
 		self.connected = False
 		self.log("Disconnected from server, Goodbye", "info")
-		self.terminate()
 
 	def connect(self, address="192.168.1.20", port=50000):
+
+		# Start controller thread
+		self.control = controller.Controller()
+		# Start controller thread
+		self.control.start()
+
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.server_address = (address, port)
 

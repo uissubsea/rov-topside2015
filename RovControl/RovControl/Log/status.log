@@ -1,0 +1,5 @@
+2015-05-24 19:36:16,921 - RovNetwork.networkclient - INFO - Connecting to ROV...
+2015-05-24 19:36:21,926 - RovNetwork.networkclient - ERROR - Unable to connect!
+
+2015-05-24 19:36:21,927 - RovNetwork.networkclient - ERROR - Failed to connect, make sure your ethernet ip is set to 192.168.1.2
+

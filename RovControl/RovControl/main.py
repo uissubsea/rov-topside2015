@@ -190,6 +190,9 @@ class MainWidget(QtGui.QMainWindow):
 
     def connect(self):
         #Start Network Client
+        if self.netClient == None:
+            self.netClient = networkclient.NetworkClient()
+        
         self.netClient.start()
         self.receiverClient.start()
         self.netClient.running = True
@@ -198,6 +201,8 @@ class MainWidget(QtGui.QMainWindow):
     def disconnect(self):
         # Stop Network client
         self.netClient.disconnect()
+
+        self.netClient = None
 
     def exit(self):
         # Stop Network client
