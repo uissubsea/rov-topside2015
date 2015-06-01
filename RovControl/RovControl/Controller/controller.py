@@ -61,6 +61,7 @@ class Controller(QtCore.QThread):
 
 		self.thData = [0] * 4
 		self.manipData = [0] * 6
+		self.buttonFunctions = [0] * 4
 
 		self.ThLinValue = []
 		self.thExpvalue = []
@@ -70,8 +71,6 @@ class Controller(QtCore.QThread):
 		# Define Qt Signals
 		self.ControlAdded = QtCore.pyqtSignal(str)
 		self.AxisChanged = QtCore.pyqtSignal(str)
-
-		
 
 
 	def run(self):
@@ -272,6 +271,14 @@ class Controller(QtCore.QThread):
 				if j == 4 or j == 5:
 					valueManip = valueManip + 65
 				self.manipData[j] = valueManip
+
+		for i in range(len(self.buttonData)):
+			for j in range(len(self.buttonData[i])):
+				if j == 1:
+					self.buttonFunctions[0] = 1;
+				elif j == 2:
+					self.buttonFunctions[0] = -1;
+
 
 
 

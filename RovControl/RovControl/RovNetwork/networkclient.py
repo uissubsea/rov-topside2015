@@ -58,7 +58,7 @@ class NetworkClient(QtCore.QThread):
 		# Start Receiver Thread
 		#self.receiver.start()
 
-		time.sleep(1)
+		time.sleep(2)
 
 		while self.connected:
 			while self.running:	
@@ -75,6 +75,8 @@ class NetworkClient(QtCore.QThread):
 
 					# Receive Data from ROV
 					self.data = str(self.sock.recv(128))
+
+					print(self.data, end="\r")
 
 					self.data = self.data.split(";")
 

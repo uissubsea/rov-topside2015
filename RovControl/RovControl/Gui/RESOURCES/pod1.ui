@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>pod1View</class>
+ <widget class="QWidget" name="pod1View">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -21,7 +21,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="mc1VLabel">
         <property name="text">
          <string>Voltage [V]</string>
         </property>
@@ -31,7 +31,7 @@
        <widget class="QLCDNumber" name="mc1_voltage"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="mc1CLabel">
         <property name="text">
          <string>Current [mA]</string>
         </property>
@@ -41,7 +41,7 @@
        <widget class="QLCDNumber" name="mc1_current"/>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="mc1PLabel">
         <property name="text">
          <string>Power [W]</string>
         </property>
@@ -60,7 +60,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="mc3VLabel">
         <property name="text">
          <string>Voltage [V]</string>
         </property>
@@ -70,7 +70,7 @@
        <widget class="QLCDNumber" name="mc3_voltage"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="mc3CLabel">
         <property name="text">
          <string>Current [mA]</string>
         </property>
@@ -80,7 +80,7 @@
        <widget class="QLCDNumber" name="mc3_current"/>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_9">
+       <widget class="QLabel" name="mc3PLabel">
         <property name="text">
          <string>Power [W]</string>
         </property>
@@ -310,7 +310,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="1" column="0">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="mc2CLabel">
         <property name="text">
          <string>Current [mA]</string>
         </property>
@@ -323,7 +323,7 @@
        <widget class="QLCDNumber" name="mc2_current"/>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_6">
+       <widget class="QLabel" name="mc2PLabel">
         <property name="text">
          <string>Power [W]</string>
         </property>
@@ -333,7 +333,7 @@
        <widget class="QLCDNumber" name="mc2_power"/>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="mc2VLabel">
         <property name="text">
          <string>Voltage [V]</string>
         </property>
