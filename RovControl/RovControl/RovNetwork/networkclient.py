@@ -76,6 +76,8 @@ class NetworkClient(QtCore.QThread):
 					# Receive Data from ROV
 					self.data = str(self.sock.recv(128))
 
+					print(self.data, end="\r")
+
 					self.data = self.data.split(";")
 
 					# Send signal to update Thrust and manip
