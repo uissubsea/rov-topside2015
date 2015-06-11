@@ -513,6 +513,7 @@ class ConfigWindow(QtGui.QWidget):
 			self.config[str(self.combo.currentText())]['DEAD_ZONE'] = str(self.dzSlider.value())
 		except KeyError:
 			print('knappefeil')
+			self.close()
 
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)

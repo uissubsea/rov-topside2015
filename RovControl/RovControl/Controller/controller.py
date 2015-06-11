@@ -260,7 +260,10 @@ class Controller(QtCore.QThread):
 					#Use exponential
 					valueTh = int(valueTh*0.02*math.pow(self.thExpvalue[i],3))
 
-				self.thData[j] = valueTh
+				if j == 1 or j==2:
+					self.thData[j] = valueTh * -1;
+				else:
+					self.thData[j] = valueTh
 			for j in range(len(self.manipMap[i])):
 				valueManip = self.axisData[i][self.manipMap[i][j]]
 				if(self.manipLinValue[i] > 0):
@@ -270,7 +273,8 @@ class Controller(QtCore.QThread):
 					valueManip = int(valueManip*0.02*math.pow(self.manipExpValue[i],3))
 
 				if j == 4 or j == 5:
-					valueManip = valueManip + 65
+					#valueManip = valueManip + 66;
+					valueManip -= valueManip;
 				self.manipData[j] = valueManip
 
 
@@ -285,7 +289,7 @@ class Controller(QtCore.QThread):
 		sdl2.SDL_JoystickUpdate()
 
 		# While loop to determine max min values
-		self.calibrateNow.emit()
+		#self.calibrateNow.emit()
 		print("No controller config for this model was found")
 		print("Calibration is required\n")
 		print("Move all joystick axes and press main button when done")		
@@ -302,40 +306,17 @@ class Controller(QtCore.QThread):
 		# Add exp and lin values
 		self.config[str(self.controllerNames[-1])]['thLin'] = '10'
 		self.config[str(self.controllerNames[-1])]['maLin'] = '10'
-		self.config[str(self.controllerNames[-1])]['thExp'] = ''
-		self.config[str(self.controllerNames[-1])]['maExp'] = ''
+		self.config[str(self.controllerNames[-1])]['thExp'] = '1'
+		self.config[str(self.controllerNames[-1])]['maExp'] = '1'
 
 		self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
 		self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
-
-		# create arrays to hold Max/Min Values
-		self.ctrl_amax = [0] * self.controllerNumAxis[-1]
-		self.ctrl_amin = [0] * self.controllerNumAxis[-1]
-
-		while( not sdl2.SDL_JoystickGetButton(self.controllers[-1], 0)):
-			for i in range(self.controllerNumAxis[-1]):
-				sdl2.SDL_JoystickUpdate()
-				value = sdl2.SDL_JoystickGetAxis(self.controllers[-1], i)
-				value = value / self.controllerSmooth[-1]
-				
-				if(value > self.ctrl_amax[i]):
-					self.ctrl_amax[i] = value;
-				if(value < self.ctrl_amin[i]):
-					self.ctrl_amin[i] = value
-
-		# Max values should now be in ctrl_axisdata list.
-		# Write values to config.
-		for i in range(self.controllerNumAxis[-1]):
-			#self.config.save_to_config(str(self.ctrl_name), "Axis" + str(i), str(self.ctrl_axisdata[i]))
-			self.config[str(self.controllerNames[-1])]['Axis' + str(i) + "Max"] = str(self.ctrl_amax[i])
-			self.config[str(self.controllerNames[-1])]['Axis' + str(i) + "Min"] = str(self.ctrl_amin[i])
-
 
 		with open('Config/controller.cfg', 'w') as configfile:
 			self.config.write(configfile)
 
 		print("Done calibrating")
-		self.calibrateDone.emit()
+		#self.calibrateDone.emit()
 
 
 	def closeController(self):
