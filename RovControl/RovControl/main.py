@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
 import sys
+import os
 
 sys.path.insert(1, "../RovControl")
 #import joystick_old_version as js
+
+os.environ["PYSDL2_DLL_PATH"] = "./libs"
 
 from PyQt4 import QtGui, QtCore
 from Gui import mainwindow, settingswindow, statuswindow, pod1, pod2, cntrconfig2
