@@ -2,14 +2,9 @@
 #sys.path.insert(1, '../Controller')
 
 import sys
-import sdl2
-import sdl2.ext
-import socket
-import threading
-import time
 import configparser
-from Controller import controller
 from PyQt4 import QtCore
+from PyQt4.QtNetwork import *
 
 import logging
 
@@ -26,8 +21,7 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
-
-class NetworkClient(QtCore.QThread):
+class NetworkClient(QtCore.QObject):
 	
 	# Signal to update statusWindow
 	updateStatus = QtCore.pyqtSignal()
@@ -37,7 +31,9 @@ class NetworkClient(QtCore.QThread):
 	def __init__(self):
 		super(NetworkClient, self).__init__()
 
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.socket = QTcpSocket()
+
+		self.socket.readyRead.connect(self.readData)
 
 		self.config = configparser.ConfigParser()
 		self.config.read('Config/controller.cfg')
@@ -52,43 +48,6 @@ class NetworkClient(QtCore.QThread):
 		self.running = True
 
 
-	def run(self):
-		self.connect()
-
-		# Start Receiver Thread
-		#self.receiver.start()
-
-		time.sleep(1)
-
-		while self.connected:
-			while self.running:	
-
-				# Process controller and get newest data
-				self.control.processController()
-
-				# Only send data if controller status changed
-				if (self.control.changed):
-
-					self.str = self.serialize(self.control.thData, self.control.manipData)
-
-					self.sock.sendall(bytes(self.str, 'UTF-8'))
-
-					# Receive Data from ROV
-					self.data = str(self.sock.recv(128))
-
-					print(self.data, end="\r")
-
-					self.data = self.data.split(";")
-
-					# Send signal to update Thrust and manip
-					self.updateThWidget.emit(self.data[0])
-					
-					if len(self.data) > 1:
-						self.updateManipWidget.emit(self.data[1])
-				
-				time.sleep(0.05)
-			time.sleep(5)
-
 	def serialize(self, thData, manipData):
 		# Create ASCII string to contain data
 		string = ""
@@ -100,41 +59,30 @@ class NetworkClient(QtCore.QThread):
 
 		return string
 
-	def disconnect(self):
-		self.running = False
-		self.control.running = False
-		self.control = None
-		# Disconnect from server
-		self.sock.close()
-		self.connected = False
+	def sendData(self, string):
+		
+		self.socket.write(bytes(string, "UTF-8"))
+		#self.socket.read()
+
+
+	def disconnectFromRov(self):
+		self.socket.disconnectFromHost()
+
 		self.log("Disconnected from server, Goodbye", "info")
 
-	def connect(self, address="192.168.1.20", port=50000):
+	def connectToRov(self, address="192.168.1.20", port=50000):
+		self.socket.connectToHost(address, port)
 
-		# Start controller thread
-		self.control = controller.Controller()
-		# Start controller thread
-		self.control.start()
+		if(self.socket.waitForConnected(5000)):
+			print("Connected!")
+			return True
+		else:
+			print("Failed to connect")
+			return False
+		return True
 
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.server_address = (address, port)
-
-		self.connected = False
-		self.sock.settimeout(5)
-		self.log("Connecting to ROV...", "info")
-		try:
-			self.sock.connect(self.server_address)
-			self.connected = True
-			self.log("Connected!", "info")
-		except socket.error as msg:
-			# Log error
-			self.log("Unable to connect!\n", "error")
-		
-		if self.connected == False:
-			self.log("Failed to connect, make sure your ethernet ip is set to 192.168.1.2\n", "error")
-		
-		self.sock.settimeout(None)
-
+	def readData(self):
+		print(self.socket.readAll(), end="\r")
 
 	def log(self, string, logType):
 		if logType == "error":

@@ -5,22 +5,29 @@ import sys
 sys.path.insert(1, "../RovControl")
 #import joystick_old_version as js
 
-from PyQt4 import QtGui, QtCore
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+
 from Gui import mainwindow, settingswindow, statuswindow, pod1, pod2, cntrconfig2
 from Gui import testWindow, manipulatorwidget, thrusterwidget, rovdata
 from Gui import camerawindow, about#, openMsgBox
 from RovNetwork import networkclient, receiver
+from Controller import controller
 
 ##############################################################################
 
-class MainWidget(QtGui.QMainWindow):
+class MainWidget(QMainWindow):
     
+    sendMessage = pyqtSignal(QByteArray);
+
     def __init__(self):
         super(MainWidget, self).__init__()
 
         # Set up the user interface from Designer.
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.cameraProcess = QProcess(self)
 
         # Make some local modifications.
 
@@ -49,19 +56,19 @@ class MainWidget(QtGui.QMainWindow):
         self.show()
 
         # Init. subwindows:
-        self.subwindow1 = QtGui.QMdiSubWindow()
-        self.subwindow2 = QtGui.QMdiSubWindow()
-        self.subwindow3 = QtGui.QMdiSubWindow()
-        self.subwindow4 = QtGui.QMdiSubWindow()
-        self.subwindow5 = QtGui.QMdiSubWindow()
-        self.subwindow6 = QtGui.QMdiSubWindow()
-        self.subwindow7 = QtGui.QMdiSubWindow()
-        self.subwindow8 = QtGui.QMdiSubWindow()
-        self.subwindow9 = QtGui.QMdiSubWindow()
-        self.subwindow10 = QtGui.QMdiSubWindow()
-        self.subwindow11 = QtGui.QMdiSubWindow()
-        self.subwindow12 = QtGui.QMdiSubWindow()
-        self.subwindow13 = QtGui.QMdiSubWindow()
+        self.subwindow1 = QMdiSubWindow()
+        self.subwindow2 = QMdiSubWindow()
+        self.subwindow3 = QMdiSubWindow()
+        self.subwindow4 = QMdiSubWindow()
+        self.subwindow5 = QMdiSubWindow()
+        self.subwindow6 = QMdiSubWindow()
+        self.subwindow7 = QMdiSubWindow()
+        self.subwindow8 = QMdiSubWindow()
+        self.subwindow9 = QMdiSubWindow()
+        self.subwindow10 = QMdiSubWindow()
+        self.subwindow11 = QMdiSubWindow()
+        self.subwindow12 = QMdiSubWindow()
+        self.subwindow13 = QMdiSubWindow()
 
         # Network Client Thread
         self.netClient = networkclient.NetworkClient()
@@ -72,8 +79,14 @@ class MainWidget(QtGui.QMainWindow):
         #Connect signals
         self.netClient.updateStatus.connect(self.update_statusWindow)
 
+        # Connect controller
+        self.control = controller.Controller()
+        self.control.start()
+
+        self.control.gotData.connect(self.netClient.sendData);
+
         # Create Status window for later use
-        self.statWindow = QtGui.QWidget()
+        self.statWindow = QWidget()
         self.ui8 = statuswindow.Ui_StatusWindow()
         self.ui8.setupUi(self.statWindow)
         self.subwindow8.setWidget(self.statWindow)
@@ -90,18 +103,18 @@ class MainWidget(QtGui.QMainWindow):
 
     def open_logFile(self):
          # Create Q Text Stream for status window
-        self.logFile = QtCore.QFile('Log/status.log')
+        self.logFile = QFile('Log/status.log')
         self.logFile.resize(0)
         try:
-            self.logFile.open(QtCore.QIODevice.ReadOnly)
-            self.stream = QtCore.QTextStream(self.logFile)
+            self.logFile.open(QIODevice.ReadOnly)
+            self.stream = QTextStream(self.logFile)
             self.ui8.textEdit.setText(self.stream.readAll())
         except AttributeError as e:
             print(e)
 
 
     def open_options(self):
-        self.optWindow = QtGui.QWidget()
+        self.optWindow = QWidget()
         self.ui1 = optionwindow.Ui_OptionsWindow()
         self.ui1.setupUi(self.optWindow)
         #self.subwindow1.setWidget(self.optWindow)
@@ -120,10 +133,11 @@ class MainWidget(QtGui.QMainWindow):
         self.rovWindow.show()
 
     def open_cam1(self):
-        self.cam1Window = camerawindow.TestWindowCam1()
-        self.subwindow5.setWidget(self.cam1Window)
-        self.ui.mdiArea.addSubWindow(self.subwindow5)
-        self.cam1Window.show()
+        #self.cam1Window = camerawindow.TestWindowCam1()
+        #self.subwindow5.setWidget(self.cam1Window)
+        #self.ui.mdiArea.addSubWindow(self.subwindow5)
+        #self.cam1Window.show()
+        self.cameraProcess.start("kamera.exe")
 
     def open_cam2(self):
         self.cam2Window = camerawindow.TestWindowCam2()
@@ -138,7 +152,7 @@ class MainWidget(QtGui.QMainWindow):
         self.cam3Window.show()
 
     def open_statusWindow(self):
-        self.statWindow = QtGui.QWidget()
+        self.statWindow = QWidget()
         self.ui8 = statuswindow.Ui_StatusWindow()
         self.ui8.setupUi(self.statWindow)
         self.subwindow8.setWidget(self.statWindow)
@@ -193,16 +207,13 @@ class MainWidget(QtGui.QMainWindow):
         if self.netClient == None:
             self.netClient = networkclient.NetworkClient()
         
-        self.netClient.start()
-        self.receiverClient.start()
-        self.netClient.running = True
+        #self.receiverClient.start()
+        self.netClient.connectToRov()
         self.open_statusWindow()
 
     def disconnect(self):
         # Stop Network client
-        self.netClient.disconnect()
-
-        self.netClient = None
+        self.netClient.disconnectFromRov()
 
     def exit(self):
         # Stop Network client
@@ -214,7 +225,7 @@ class MainWidget(QtGui.QMainWindow):
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     #window = StartWindow()
     window = MainWidget()
     window.show()

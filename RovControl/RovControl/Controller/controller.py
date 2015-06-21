@@ -20,6 +20,7 @@ class Controller(QtCore.QThread):
 	#gui-signal for calibreringsvindu:
 	calibrateNow = QtCore.pyqtSignal()
 	calibrateDone = QtCore.pyqtSignal()
+	gotData = QtCore.pyqtSignal(str)
 
 	def __init__(self):
 		super(Controller, self).__init__()
@@ -57,10 +58,12 @@ class Controller(QtCore.QThread):
 
 		self.thrusterMap = []
 		self.manipMap = []
+		self.buttonMap = []
 		self.inverseMap = []
 
 		self.thData = [0] * 4
 		self.manipData = [0] * 6
+		self.miscData = [0] * 4
 
 		self.ThLinValue = []
 		self.thExpvalue = []
@@ -70,9 +73,6 @@ class Controller(QtCore.QThread):
 		# Define Qt Signals
 		self.ControlAdded = QtCore.pyqtSignal(str)
 		self.AxisChanged = QtCore.pyqtSignal(str)
-
-		
-
 
 	def run(self):
 
@@ -89,12 +89,18 @@ class Controller(QtCore.QThread):
 			while(self.running):
 				self.events = sdl2.ext.get_events()
 				self.changed = False
+				#time.sleep(0.05)
 				for event in self.events:
 					self.handleEvents(event)
+					#time.sleep(0.05)
+				if(self.changed):
+					self.processController()
+					
+				time.sleep(0.05)
 				#self.changed = False
 				#print(self.axisData)
 
-				time.sleep(0.05)
+				#time.sleep(0.05)
 
 			self.closeController()
 
@@ -147,6 +153,7 @@ class Controller(QtCore.QThread):
 							self.buttonData[i][j] = event.jbutton.state
 							#print("Key pressed")
 							#self.running = False
+
 		# Other Events
 
 	def handleSettingEvents(self, event):
@@ -218,12 +225,14 @@ class Controller(QtCore.QThread):
 		for idx, controller in enumerate(self.controllerNames):
 			self.thrusterMap.append(self.config[str(controller)]["ThMap"])
 			self.manipMap.append(self.config[str(controller)]["ManipMap"])
+			self.buttonMap.append(self.config[str(controller)]["btnMap"])
 			self.ThLinValue.append(self.config[str(controller)]["thlin"])
 			self.thExpvalue.append(self.config[str(controller)]["thExp"])
 			self.manipLinValue.append(self.config[str(controller)]["malin"])
 			self.manipExpValue.append(self.config[str(controller)]["maExp"])
 			self.thrusterMap[idx] = re.findall(r'\d+', self.thrusterMap[idx])
 			self.manipMap[idx] = re.findall(r'\d+', self.manipMap[idx])
+			self.buttonMap[idx] = re.findall(r'\d+', self.buttonMap[idx])
 			self.controllerDeadZone.append(int(self.config[str(self.controllerNames[-1])]['DEAD_ZONE']))
 			self.controllerSmooth.append(int(self.config[str(self.controllerNames[-1])]['SMOOTH']))
 
@@ -235,6 +244,10 @@ class Controller(QtCore.QThread):
 		for i in range(len(self.controllerNames)):
 			for j in range(len(self.manipMap[i])):
 				self.manipMap[i][j] = int(self.manipMap[i][j])
+
+		for i in range(len(self.controllerNames)):
+			for j in range(len(self.buttonMap[i])):
+				self.buttonMap[i][j] = int(self.buttonMap[i][j])
 
 		for i in range(len(self.controllerNames)):
 			self.ThLinValue[i] = int(self.ThLinValue[i])
@@ -276,6 +289,30 @@ class Controller(QtCore.QThread):
 					#valueManip = valueManip + 66;
 					valueManip -= valueManip;
 				self.manipData[j] = valueManip
+
+		for button in range(len(self.buttonData)):
+			for buttonFunction in range(len(self.buttonMap[button])):
+				buttonValue = self.buttonData[button][self.buttonMap[button][buttonFunction]]
+				if (buttonFunction == 1 or buttonFunction == 2):
+					total = 0 + 1;
+					self.miscData[buttonFunction] = 0
+					self.miscData[buttonFunction] = total - self.miscData[buttonFunction]
+
+				self.miscData[buttonFunction] = buttonValue
+
+		#for i in range(len(self.buttonData)):
+
+		string = ""
+		# Loop through first 4 data. Assume they are thruster values
+		for item in self.thData:
+			string += str(item) + ","
+		for item in self.manipData:
+			string += str(item) + ","
+		for item in self.miscData:
+			string += str(item) + ","
+
+		self.gotData.emit(string)
+
 
 
 
