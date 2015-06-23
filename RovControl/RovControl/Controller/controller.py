@@ -11,6 +11,7 @@ import sdl2.ext
 import time
 import configparser
 from PyQt4 import QtCore, QtGui
+from itertools import cycle
 import re
 import math
 
@@ -73,6 +74,13 @@ class Controller(QtCore.QThread):
 		# Define Qt Signals
 		self.ControlAdded = QtCore.pyqtSignal(str)
 		self.AxisChanged = QtCore.pyqtSignal(str)
+
+		self.toggler = cycle(range(2))
+
+		self.cameraServoValue = 750
+		self.lightState = 1
+		self.lightFrequency = 1000
+		self.laserState = 1
 
 	def run(self):
 
@@ -204,7 +212,14 @@ class Controller(QtCore.QThread):
 				self.instanceIDs.append(sdl2.SDL_JoystickInstanceID(self.controllers[-1]))
 
 			# Log name of last connected joystick. -1 list index is last element
+			# Check if the controllers have the same name
+			#numControllers = len(self.controllerNames)
+			#if(self.controllerNames[-1] == sdl2.SDL_JoystickName(self.controllers[-1])):
+			#	self.controllerNames.append(sdl2.SDL_JoystickName(self.controllers[-1]) + "2")
+			#else:
+			
 			self.controllerNames.append(sdl2.SDL_JoystickName(self.controllers[-1]))
+			
 			print("Opened controller %s" %(self.controllerNames[-1]))
 
 			# The following 
@@ -286,17 +301,15 @@ class Controller(QtCore.QThread):
 					valueManip = int(valueManip*0.02*math.pow(self.manipExpValue[i],3))
 
 				if j == 4 or j == 5:
-					#valueManip = valueManip + 66;
-					valueManip -= valueManip;
+					valueManip = valueManip + 65;
+					#valueManip -= valueManip;
 				self.manipData[j] = valueManip
 
 		for button in range(len(self.buttonData)):
 			for buttonFunction in range(len(self.buttonMap[button])):
 				buttonValue = self.buttonData[button][self.buttonMap[button][buttonFunction]]
-				if (buttonFunction == 1 or buttonFunction == 2):
-					total = 0 + 1;
-					self.miscData[buttonFunction] = 0
-					self.miscData[buttonFunction] = total - self.miscData[buttonFunction]
+				if (buttonFunction == 1 or buttonFunction == 3):
+					buttonValue = next(self.toggler)
 
 				self.miscData[buttonFunction] = buttonValue
 
@@ -308,13 +321,13 @@ class Controller(QtCore.QThread):
 			string += str(item) + ","
 		for item in self.manipData:
 			string += str(item) + ","
-		for item in self.miscData:
-			string += str(item) + ","
+		
+		string += str(self.cameraServoValue) + ","
+		string += str(self.lightState) + ","
+		string += str(self.lightFrequency) + ","
+		string += str(self.laserState) + ","
 
 		self.gotData.emit(string)
-
-
-
 
 	def calibrate(self):
 		# If We have entered this function, the config has no
@@ -365,10 +378,18 @@ class Controller(QtCore.QThread):
 			sdl2.SDL_JoystickClose(self.controllers[i])
 			print("Closed controller %s" %(self.controllers[i]))
 
+	def setCameraServoValue(self, value):
+		self.cameraServoValue = value
+		self.processController()
 
+	def setLaserState(self, state):
+		self.laserState = state
+		self.processController()
 
+	def setLightState(self, state):
+		self.lightState = state
+		self.processController()
 
-
-
-
-
+	def setLightFrequency(self, freq):
+		self.lightFrequency = freq
+		self.processController()

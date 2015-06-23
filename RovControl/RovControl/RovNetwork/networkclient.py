@@ -62,6 +62,7 @@ class NetworkClient(QtCore.QObject):
 	def sendData(self, string):
 		
 		self.socket.write(bytes(string, "UTF-8"))
+		#print(string)
 		#self.socket.read()
 
 
@@ -79,7 +80,6 @@ class NetworkClient(QtCore.QObject):
 		else:
 			print("Failed to connect")
 			return False
-		return True
 
 	def readData(self):
 		print(self.socket.readAll(), end="\r")

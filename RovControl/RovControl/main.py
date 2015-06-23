@@ -11,6 +11,7 @@ from PyQt4.QtCore import *
 from Gui import mainwindow, settingswindow, statuswindow, pod1, pod2, cntrconfig2
 from Gui import testWindow, manipulatorwidget, thrusterwidget, rovdata
 from Gui import camerawindow, about#, openMsgBox
+from Gui import remote
 from RovNetwork import networkclient, receiver
 from Controller import controller
 
@@ -94,12 +95,23 @@ class MainWidget(QMainWindow):
         self.ui8.textEdit.setReadOnly(True)
         self.open_logFile()
 
+        self.remoteWindow = remote.Remote()
+        self.remoteWindow.show()
+        self.remoteSubWindow = QMdiSubWindow()
+        self.remoteSubWindow.setWidget(self.remoteWindow)
+        self.ui.mdiArea.addSubWindow(self.remoteSubWindow)
+        self.remoteSubWindow.show()
+
+        self.remoteWindow.ui.servoSlider.valueChanged.connect(self.control.setCameraServoValue)
+        self.remoteWindow.ui.laserState.stateChanged.connect(self.control.setLaserState)
+        self.remoteWindow.ui.lightState.stateChanged.connect(self.control.setLightState)
+        self.remoteWindow.ui.lightSlider.valueChanged.connect(self.control.setLightFrequency)
+
     def update_statusWindow(self):
         try:
             self.ui8.textEdit.setText(self.stream.readAll())
         except AttributeError as e:
             print(e)
-        
 
     def open_logFile(self):
          # Create Q Text Stream for status window
